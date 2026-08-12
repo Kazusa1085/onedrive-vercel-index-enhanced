@@ -37,11 +37,13 @@ const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
       <div className="h-32 overflow-hidden rounded-xl border border-(--line-divider) transition-all duration-200 group-hover:rounded-2xl">
         {thumbnailUrl && !brokenThumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            className="h-full w-full object-cover object-top"
-            src={thumbnailUrl}
-            alt={c.name}
-            onError={() => setBrokenThumbnail(true)}
+            <img
+              className="h-full w-full object-cover object-top"
+              src={thumbnailUrl}
+              alt={c.name}
+              loading="lazy"
+              decoding="async"
+              onError={() => setBrokenThumbnail(true)}
           />
         ) : (
           <div className="relative flex h-full w-full items-center justify-center rounded-lg">
@@ -94,18 +96,19 @@ const FolderGridItem = ({
       className="card-glare-host group onload-animation relative overflow-hidden rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-1 hover:bg-(--btn-plain-bg-hover) hover:shadow-(--card-shadow-hover)"
       style={{ animationDelay: `${Math.min(index, 8) * 50}ms` }}
     >
-      <div className="absolute top-0 right-0 z-10 m-1 rounded-sm bg-white/50 py-0.5 opacity-0 transition-all duration-100 group-hover:opacity-100 dark:bg-gray-900/50">
+      <div className="absolute top-0 right-0 z-10 m-1 rounded-sm bg-white/50 py-0.5 opacity-100 transition-all duration-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 dark:bg-gray-900/50">
         {c.folder ? (
           <div>
             <span
               title="Copy folder permalink"
+              aria-label={`Copy link for folder ${c.name}`}
               role="button"
               tabIndex={0}
               onKeyDown={activateOnKeyDown(() => {
                 clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
                 toast('Copied folder permalink.', { icon: '👌' })
               })}
-              className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+              className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
               onClick={() => {
                 clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
                 toast('Copied folder permalink.', { icon: '👌' })
@@ -118,10 +121,11 @@ const FolderGridItem = ({
             ) : (
               <span
                 title="Download folder"
+                aria-label={`Download folder ${c.name}`}
                 role="button"
                 tabIndex={0}
                 onKeyDown={activateOnKeyDown(handleFolderDownload(getItemPath(c.name), c.id, c.name))}
-                className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+                className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
                 onClick={handleFolderDownload(getItemPath(c.name), c.id, c.name)}
               >
                 <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
@@ -132,13 +136,14 @@ const FolderGridItem = ({
           <div>
             <span
               title="Copy raw file permalink"
+              aria-label={`Copy link for file ${c.name}`}
               role="button"
               tabIndex={0}
               onKeyDown={activateOnKeyDown(() => {
                 clipboard.copy(buildRawUrl(getItemPath(c.name)))
                 toast.success('Copied raw file permalink.')
               })}
-              className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+              className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
               onClick={() => {
                 clipboard.copy(buildRawUrl(getItemPath(c.name)))
                 toast.success('Copied raw file permalink.')
@@ -148,7 +153,8 @@ const FolderGridItem = ({
                   </span>
                   <a
                     title="Download file"
-                    className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+                    aria-label={`Download file ${c.name}`}
+                    className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
                     href={buildRawUrl(getItemPath(c.name))}
                   >
                     <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />

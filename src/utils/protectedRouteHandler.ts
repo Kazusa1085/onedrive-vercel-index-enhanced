@@ -42,25 +42,22 @@ export function compareHashedToken({
 
 export function matchProtectedRoute(route: string): string {
   const protectedRoutes: string[] = siteConfig.protectedRoutes
-  let authTokenPath = ''
+  const normalizedRoute = (() => {
+    try {
+      return decodeURIComponent(route).replace(/\/+$/, '').toLowerCase()
+    } catch {
+      return route.replace(/\/+$/, '').toLowerCase()
+    }
+  })()
 
   for (const r of protectedRoutes) {
     // protected route array could be empty
     if (r) {
-      if (
-        route.startsWith(
-          r
-            .split('/')
-            .map(p => encodeURIComponent(p))
-            .join('/')
-        )
-      ) {
-        authTokenPath = r
-        break
-      }
+      const normalizedProtectedRoute = r.replace(/\/+$/, '').toLowerCase()
+      if (normalizedRoute === normalizedProtectedRoute || normalizedRoute.startsWith(normalizedProtectedRoute + '/')) return r
     }
   }
-  return authTokenPath
+  return ''
 }
 
 /**
@@ -73,10 +70,10 @@ export function isProtectedGraphPath(drivePath: string): boolean {
   try {
     const decoded = decodeURIComponent(drivePath)
     const rootIndex = decoded.indexOf('root:')
-    const sitePath = '/' + (rootIndex !== -1 ? decoded.slice(rootIndex + 5) : decoded).replace(/"/g, '')
+    const sitePath = ('/' + (rootIndex !== -1 ? decoded.slice(rootIndex + 5) : decoded).replace(/"/g, '')).toLowerCase()
 
     for (const route of siteConfig.protectedRoutes) {
-      const normalized = '/' + route.replace(/^\/+|\/+$/g, '')
+      const normalized = '/' + route.replace(/^\/+|\/+$/g, '').toLowerCase()
       if (sitePath === normalized || sitePath.startsWith(normalized + '/')) {
         return true
       }

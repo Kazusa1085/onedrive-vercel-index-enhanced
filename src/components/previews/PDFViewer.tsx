@@ -24,7 +24,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url }) => {
     // Reset on url/retry change; single setState, no cascading renders.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStatus('loading')
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setErrorMsg('')
     pdfjs
       .getDocument({ url, rangeChunkSize: 65536 })
@@ -52,7 +51,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url }) => {
       try {
         const page = await doc.getPage(pageNum)
         if (cancelled) return
-        const dpr = window.devicePixelRatio || 1
+        const dpr = Math.min(window.devicePixelRatio || 1, 2)
         const baseViewport = page.getViewport({ scale: 1 })
         const scale = (container.clientWidth / baseViewport.width) * dpr
         const viewport = page.getViewport({ scale })

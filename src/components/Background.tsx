@@ -25,7 +25,7 @@ const Background = () => {
   // Layered parallax: move each blob layer toward the cursor with a damped
   // lerp, every layer at its own speed factor for depth (GPU-friendly).
   useEffect(() => {
-    if (image) return
+    if (image || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
     const speeds = [0.015, 0.03, 0.045, 0.06]
     let raf = 0

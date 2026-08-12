@@ -4,17 +4,13 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import apiConfig from '../../../config/api.config'
 import siteConfig from '../../../config/site.config'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 
-import { getUserPrincipalNameFromToken, requestTokenWithAuthCode } from '../../utils/oAuthHandler'
 
 export async function getServerSideProps({ query }) {
   const { authCode } = query
-  const clientId = apiConfig.clientId
-  const clientSecret = apiConfig.obfuscatedClientSecret
   const userPrincipalName = siteConfig.userPrincipalName
 
   // dynamic imports keep server-only deps like ioredis out of the client bundle
@@ -41,8 +37,8 @@ export async function getServerSideProps({ query }) {
     }
   }
 
-  const config = { clientId, clientSecret, userPrincipalName }
-  const response = await requestTokenWithAuthCode(authCode, config)
+  const { accessTokenBelongsToOwner, requestTokenWithAuthCode } = await import('../../utils/oAuthServer')
+  const response = await requestTokenWithAuthCode(authCode)
 
   // If error response, return invalid
   if ('error' in response) {
@@ -55,17 +51,15 @@ export async function getServerSideProps({ query }) {
     }
   }
 
-  const { expiryTime, accessToken, refreshToken, idToken } = response
+  const { expiryTime, accessToken, refreshToken } = response
 
-  // Verify identity of the authenticated user server-side via the identity claims
-  // embedded in the Microsoft-signed JWTs. Access tokens and refresh tokens must
-  // never leave the server: only verified tokens are stored.
-  const tokenUpn = getUserPrincipalNameFromToken(idToken, accessToken)
-  if (!tokenUpn || tokenUpn.toLowerCase() !== userPrincipalName.toLowerCase()) {
+  // Verify the authenticated account through Graph. JWT payload decoding alone
+  // is not proof of identity because it does not verify a token signature.
+  if (!userPrincipalName || !(await accessTokenBelongsToOwner(accessToken, userPrincipalName))) {
     return {
       props: {
         error: 'Identity mismatch',
-        description: `Do not pretend to be the site owner. Expected ${userPrincipalName}, got ${tokenUpn ?? 'unavailable'}.`,
+        description: 'The authenticated Microsoft account does not match USER_PRINCIPAL_NAME.',
       },
     }
   }

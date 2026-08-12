@@ -15,7 +15,7 @@ const ImagePreview: FC<{ file: OdFileObject }> = ({ file }) => {
       <PreviewContainer>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          className="mx-auto"
+          className="mx-auto h-auto max-w-full"
           src={buildRawUrl(asPath)}
           alt={file.name}
           width={file.image?.width}

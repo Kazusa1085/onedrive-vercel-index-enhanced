@@ -78,8 +78,8 @@
 
 ## Markdown 原始 HTML 渲染开关
 
-Markdown 预览（README.md 等 `.md` 文件）默认允许渲染原始 HTML 标签，这是为了保证与旧版行为一致。
-注意：开启时，OneDrive 中任何 `.md` 文件里包含的 HTML（含脚本）都会在访问者的浏览器中执行，**仅在你信任自己共享目录里的所有 Markdown 文件时**才应保持开启。
+Markdown 预览（README.md 等 `.md` 文件）默认允许渲染一组安全的原始 HTML 标签（例如 `details`、`summary`、`kbd`），这是为了保证与旧版行为一致。
+开启时 HTML 会经过严格白名单过滤；脚本、事件属性、iframe、表单、危险链接和危险 SVG 特性都会被移除。即使如此，若不需要 HTML，关闭此开关仍是最保守的选择。
 
 关闭方法：编辑 `config/site.config.js`，将 `allowRawHtmlInMarkdown` 改为 `false`，重新部署即可。
 

@@ -1,14 +1,14 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import siteConfig from '../../../config/site.config'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { LoadingIcon } from '../../components/Loading'
-import { extractAuthCodeFromRedirected, generateAuthorisationUrl } from '../../utils/oAuthHandler'
+import { extractAuthCodeFromRedirected } from '../../utils/oAuthClient'
 
 export async function getServerSideProps() {
   // dynamic import keeps server-only deps like ioredis out of the client bundle
@@ -24,27 +24,22 @@ export async function getServerSideProps() {
       },
     }
   }
-  // If the accessToken does not exist, render the page normally
+  const { generateAuthorisationUrl } = await import('../../utils/oAuthServer')
+  const { default: apiConfig } = await import('../../../config/api.config')
   return {
     props: {
+      oAuthUrl: generateAuthorisationUrl(),
+      redirectUri: apiConfig.redirectUri,
     },
-  };
+  }
 }
 
-export default function OAuthStep2() {
+export default function OAuthStep2({ oAuthUrl, redirectUri }: { oAuthUrl: string; redirectUri: string }) {
   const router = useRouter()
 
   const [oAuthRedirectedUrl, setOAuthRedirectedUrl] = useState('')
   const [authCode, setAuthCode] = useState('')
   const [buttonLoading, setButtonLoading] = useState(false)
-
-  // const oAuthUrl = generateAuthorisationUrl()
-
-  const [oAuthUrl, setOAuthUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    generateAuthorisationUrl().then(url => setOAuthUrl(url))
-  }, [])
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
@@ -80,16 +75,12 @@ export default function OAuthStep2() {
               role="button"
               tabIndex={0}
               onClick={() => {
-                if (oAuthUrl) {
-                  window.open(oAuthUrl)
-                }
+                window.open(oAuthUrl, '_blank', 'noopener,noreferrer')
               }}
               onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault()
-                  if (oAuthUrl) {
-                    window.open(oAuthUrl)
-                  }
+                  window.open(oAuthUrl, '_blank', 'noopener,noreferrer')
                 }
               }}
             >
@@ -125,7 +116,7 @@ export default function OAuthStep2() {
               value={oAuthRedirectedUrl}
               onChange={e => {
                 setOAuthRedirectedUrl(e.target.value)
-                setAuthCode(extractAuthCodeFromRedirected(e.target.value))
+                setAuthCode(extractAuthCodeFromRedirected(e.target.value, redirectUri))
               }}
             />
 

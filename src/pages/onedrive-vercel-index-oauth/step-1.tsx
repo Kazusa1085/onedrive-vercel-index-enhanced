@@ -3,14 +3,12 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 import siteConfig from '../../../config/site.config'
-import apiConfig from '../../../config/api.config'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export async function getServerSideProps() {
-  const clientId = apiConfig.clientId;
-  const clientSecret = apiConfig.obfuscatedClientSecret;
+  const { default: apiConfig } = await import('../../../config/api.config')
   // Get accessToken using getAccessToken function
   // (dynamic import keeps server-only deps like ioredis out of the client bundle)
   const { getAccessToken } = await import('../api');
@@ -27,13 +25,16 @@ export async function getServerSideProps() {
   // If the accessToken does not exist, render the page normally
   return {
     props: {
-      clientId,
-      clientSecret,
+      clientId: apiConfig.clientId,
+      redirectUri: apiConfig.redirectUri,
+      authApi: apiConfig.authApi,
+      driveApi: apiConfig.driveApi,
+      scope: apiConfig.scope,
     },
-  };
+  }
 }
 
-export default function OAuthStep1({ clientId, clientSecret }) {
+export default function OAuthStep1({ clientId, redirectUri, authApi, driveApi, scope }) {
   const router = useRouter()
 
   return (
@@ -93,18 +94,10 @@ export default function OAuthStep1({ clientId, clientSecret }) {
                   </tr>
                   <tr className="border-y border-(--line-divider)">
                     <td className="py-1 px-3 text-left text-xs font-medium uppercase tracking-wider text-(--content-meta)">
-                      CLIENT_SECRET*
-                    </td>
-                    <td className="whitespace-nowrap py-1 px-3 text-(--content-meta)">
-                      <code className="font-mono text-sm">{clientSecret}</code>
-                    </td>
-                  </tr>
-                  <tr className="border-y border-(--line-divider)">
-                    <td className="py-1 px-3 text-left text-xs font-medium uppercase tracking-wider text-(--content-meta)">
                       REDIRECT_URI
                     </td>
                     <td className="whitespace-nowrap py-1 px-3 text-(--content-meta)">
-                      <code className="font-mono text-sm">{apiConfig.redirectUri}</code>
+                      <code className="font-mono text-sm">{redirectUri}</code>
                     </td>
                   </tr>
                   <tr className="border-y border-(--line-divider)">
@@ -112,7 +105,7 @@ export default function OAuthStep1({ clientId, clientSecret }) {
                       Auth API URL
                     </td>
                     <td className="whitespace-nowrap py-1 px-3 text-(--content-meta)">
-                      <code className="font-mono text-sm">{apiConfig.authApi}</code>
+                      <code className="font-mono text-sm">{authApi}</code>
                     </td>
                   </tr>
                   <tr className="border-y border-(--line-divider)">
@@ -120,7 +113,7 @@ export default function OAuthStep1({ clientId, clientSecret }) {
                       Drive API URL
                     </td>
                     <td className="whitespace-nowrap py-1 px-3 text-(--content-meta)">
-                      <code className="font-mono text-sm">{apiConfig.driveApi}</code>
+                      <code className="font-mono text-sm">{driveApi}</code>
                     </td>
                   </tr>
                   <tr className="border-y border-(--line-divider)">
@@ -128,7 +121,7 @@ export default function OAuthStep1({ clientId, clientSecret }) {
                       API Scope
                     </td>
                     <td className="whitespace-nowrap py-1 px-3 text-(--content-meta)">
-                      <code className="font-mono text-sm">{apiConfig.scope}</code>
+                      <code className="font-mono text-sm">{scope}</code>
                     </td>
                   </tr>
                 </tbody>

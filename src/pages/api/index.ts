@@ -5,7 +5,7 @@ import axios from 'axios'
 
 import apiConfig from '../../../config/api.config'
 import siteConfig from '../../../config/site.config'
-import { getUserPrincipalNameFromToken, revealObfuscatedToken } from '../../utils/oAuthHandler'
+import { revealObfuscatedToken } from '../../utils/oAuthServer'
 import { compareHashedToken } from '../../utils/protectedRouteHandler'
 import { getOdAuthTokens, storeOdAuthTokens } from '../../utils/odAuthTokenStore'
 import { setCorsHeaders } from './raw'
@@ -159,38 +159,16 @@ export async function checkAuthRoute(
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // If method is POST, then the API is called by the client to store acquired tokens
-  if (req.method === 'POST') {
-    const { obfuscatedAccessToken, accessTokenExpiry, obfuscatedRefreshToken } = req.body ?? {}
-    const accessToken = revealObfuscatedToken(obfuscatedAccessToken)
-    const refreshToken = revealObfuscatedToken(obfuscatedRefreshToken)
-
-    if (typeof accessToken !== 'string' || typeof refreshToken !== 'string') {
-      res.status(400).send('Invalid request body')
-      return
-    }
-
-    const expiry = Number.parseInt(accessTokenExpiry)
-    if (!Number.isInteger(expiry) || expiry <= 0) {
-      res.status(400).send('Invalid access token expiry')
-      return
-    }
-
-    // Server-side identity check: only allow tokens belonging to the site owner
-    // to be stored, otherwise any visitor could take over the site's tokens.
-    const tokenUpn = getUserPrincipalNameFromToken(accessToken)
-    if (!tokenUpn || tokenUpn.toLowerCase() !== siteConfig.userPrincipalName?.toLowerCase()) {
-      res.status(403).send('Forbidden')
-      return
-    }
-
-    await storeOdAuthTokens({ accessToken, accessTokenExpiry: expiry, refreshToken })
-    res.status(200).send('OK')
+  // OAuth code exchange and token storage happen server-side in OAuth Step 3.
+  // Never accept browser-submitted access or refresh tokens here.
+  if (req.method !== 'GET') {
+    res.setHeader('Allow', 'GET')
+    res.status(405).end()
     return
   }
 
   // If method is GET, then the API is a normal request to the OneDrive API for files or folders
-  const { path = '/', raw = false, next = '', sort = '' } = req.query
+  const { path = '/', raw = false, next = '', sort = '', odpt = '' } = req.query
 
   // Set edge function caching for faster load times, check docs:
   // https://vercel.com/docs/concepts/functions/edge-caching
@@ -224,7 +202,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Handle protected routes authentication
-  const { code, message } = await checkAuthRoute(cleanPath, accessToken, req.headers['od-protected-token'] as string)
+  const headerToken = req.headers['od-protected-token']
+  const protectedToken = typeof headerToken === 'string' ? headerToken : typeof odpt === 'string' ? odpt : ''
+  const { code, message } = await checkAuthRoute(cleanPath, accessToken, protectedToken)
   // Status code other than 200 means user has not authenticated yet
   if (code !== 200) {
     res.status(code).json({ error: message })

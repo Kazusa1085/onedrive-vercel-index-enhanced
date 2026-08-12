@@ -1,10 +1,11 @@
 import { FC, CSSProperties, ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
-import type { Components, ExtraProps } from 'react-markdown'
+import type { Components, ExtraProps, Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/light-async'
 import { tomorrowNight } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 
@@ -33,6 +34,19 @@ const LANGUAGE_ALIASES: Record<string, string> = {
   txt: 'plaintext',
   text: 'plaintext',
 }
+
+// Keep code readable with a dark syntax theme while tying its frame into the
+// site's hue-driven glass system.
+const CODE_BLOCK_STYLE: CSSProperties = {
+  margin: '1rem 0',
+  background: 'oklch(0.22 0.018 var(--hue) / 0.92)',
+  border: '1px solid oklch(0.7 0.14 var(--hue) / 0.28)',
+  borderLeft: '3px solid var(--primary)',
+  borderRadius: '0.75rem',
+  boxShadow: 'var(--card-shadow)',
+}
+
+const RAW_HTML_SANITIZE_PLUGINS: NonNullable<Options['rehypePlugins']> = [rehypeRaw, [rehypeSanitize, defaultSchema]]
 
 const MarkdownPreview: FC<{
   file: OdFolderChildren
@@ -128,7 +142,7 @@ const MarkdownPreview: FC<{
       const rawLanguage = (match ? match[1] : 'text').toLowerCase()
       const language = LANGUAGE_ALIASES[rawLanguage] ?? rawLanguage
       return (
-        <SyntaxHighlighter language={language} style={tomorrowNight} PreTag="div" {...props}>
+        <SyntaxHighlighter language={language} style={tomorrowNight} customStyle={CODE_BLOCK_STYLE} PreTag="div" {...props}>
           {String(children).replace(/\n$/, '')}
         </SyntaxHighlighter>
       )
@@ -155,7 +169,7 @@ const MarkdownPreview: FC<{
               Controlled by siteConfig.allowRawHtmlInMarkdown (see config/site.config.js. #18) */}
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex, ...(siteConfig.allowRawHtmlInMarkdown ? [rehypeRaw] : [])]}
+            rehypePlugins={siteConfig.allowRawHtmlInMarkdown ? [...RAW_HTML_SANITIZE_PLUGINS, rehypeKatex] : [rehypeKatex]}
             components={customRenderer as Components}
           >
             {content}
