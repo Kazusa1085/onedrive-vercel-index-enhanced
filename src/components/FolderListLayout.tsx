@@ -162,7 +162,7 @@ const FolderListLayout = ({
         <div className="col-span-1 hidden py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
           Size
         </div>
-        <div className="col-span-2 hidden py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
+        <div className="col-span-2 hidden py-2 text-right text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
           Actions
         </div>
       </div>
