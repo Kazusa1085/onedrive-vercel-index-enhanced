@@ -5,6 +5,8 @@
   color: #24292e;
   /* Transparent: the surrounding PreviewContainer (card-base) is the glass card. */
   background-color: transparent;
+  /* Restore comfortable inner spacing (previously provided by the removed inner card). */
+  padding: 1rem 1.25rem;
   font-size: 16px;
   word-wrap: break-word;
 }
