@@ -8,9 +8,9 @@ import type { PDFDocumentProxy } from 'pdfjs-dist'
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/legacy/build/pdf.worker.min.mjs', import.meta.url).toString()
 
-type PDFViewerProps = { url: string }
+type PDFViewerProps = { url: string; fileSize?: number }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ url }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ url, fileSize }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null)
   const [pageNum, setPageNum] = useState(1)
@@ -18,6 +18,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMsg, setErrorMsg] = useState('')
   const [retryCount, setRetryCount] = useState(0)
+  // 'range' streams the PDF in small chunks; if that fails (some mobile
+  // networks/proxies break partial-content responses), retry once with a
+  // single full download before giving up.
+  const [mode, setMode] = useState<'range' | 'full'>('range')
 
   useEffect(() => {
     let cancelled = false
@@ -25,8 +29,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url }) => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStatus('loading')
     setErrorMsg('')
+
+    // Providing `length` lets pdf.js skip the initial whole-file probe and
+    // start chunked range requests immediately, avoiding slow full downloads
+    // that time out on mobile connections.
+    const params =
+      mode === 'range'
+        ? { url, rangeChunkSize: 65536, ...(fileSize && fileSize > 0 ? { length: fileSize } : {}) }
+        : { url, disableRange: true }
+
     pdfjs
-      .getDocument({ url, rangeChunkSize: 65536 })
+      .getDocument(params)
       .promise.then(pdf => {
         if (cancelled) return
         setDoc(pdf)
@@ -35,13 +48,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url }) => {
       })
       .catch(e => {
         if (cancelled) return
+        if (mode === 'range') {
+          setMode('full')
+          return
+        }
         setErrorMsg(e?.message ?? 'Failed to load the PDF')
         setStatus('error')
       })
     return () => {
       cancelled = true
     }
-  }, [url, retryCount])
+  }, [url, retryCount, mode, fileSize])
 
   useEffect(() => {
     if (status !== 'ready' || !doc || !containerRef.current) return
@@ -90,7 +107,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url }) => {
         <div className="font-medium text-(--content-main)">无法加载 PDF 预览</div>
         <div className="max-w-full truncate text-xs opacity-70">{errorMsg}</div>
         <div className="flex items-center space-x-3">
-          <button className="btn-plain border border-(--line-divider) px-3 py-1.5" onClick={() => setRetryCount(c => c + 1)}>
+          <button
+            className="btn-plain border border-(--line-divider) px-3 py-1.5"
+            onClick={() => {
+              setMode('range')
+              setRetryCount(c => c + 1)
+            }}
+          >
             重试
           </button>
           <a href={url} target="_blank" rel="noopener noreferrer" className="btn-plain border border-(--line-divider) px-3 py-1.5">

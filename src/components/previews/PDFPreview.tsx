@@ -25,7 +25,7 @@ const PDFEmbedPreview: FC<{ file: OdFileObject }> = ({ file: _file }) => {
   return (
     <div>
       <div className="w-full overflow-hidden rounded-sm" style={{ height: '90vh' }}>
-        <PDFViewer key={rawUrl} url={rawUrl} />
+        <PDFViewer key={rawUrl} url={rawUrl} fileSize={_file.size} />
       </div>
       <DownloadBtnContainer>
         <div className="flex items-center justify-between space-x-2">
