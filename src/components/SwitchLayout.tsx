@@ -35,7 +35,7 @@ const SwitchLayout = () => {
           leaveFrom="transform scale-100 opacity-100"
           leaveTo="transform scale-95 opacity-0"
         >
-          <Listbox.Options className="absolute right-0 z-[110] mt-1 w-32 overflow-auto rounded-xl border border-(--line-divider) bg-(--card-bg-transparent) py-1 shadow-(--card-shadow) backdrop-blur-xl focus:outline-hidden">
+          <Listbox.Options className="absolute right-0 top-full z-[110] mt-1 w-32 overflow-auto rounded-xl border border-(--line-divider) bg-(--card-bg-transparent) py-1 shadow-(--card-shadow) backdrop-blur-xl focus:outline-hidden">
             {layouts.map(layout => (
               <Listbox.Option
                 key={layout.id}
