@@ -23,19 +23,21 @@ const activateOnKeyDown =
     }
   }
 
+// Column widths (desktop): Name 7 + Last Modified 2 + Size 1 = 10 tracks inside
+// the Link, plus 2 tracks for Actions, filling the 12-track grid completely.
 const FileListItem: FC<{ fileContent: OdFolderChildren }> = ({ fileContent: c }) => {
   return (
-    <div className="grid cursor-pointer grid-cols-10 items-center space-x-2 px-3 py-2.5">
-      <div className="col-span-10 flex items-center space-x-2 truncate md:col-span-6" title={c.name}>
+    <div className="grid grid-cols-10 items-center">
+      <div className="col-span-10 flex min-w-0 items-center space-x-2 truncate md:col-span-7" title={c.name}>
         <div className="w-5 shrink-0 text-center">
           <ChildIcon child={c} />
         </div>
         <ChildName name={c.name} folder={Boolean(c.folder)} />
       </div>
-      <div className="col-span-3 hidden shrink-0 font-mono text-sm text-(--content-meta) md:block">
+      <div className="col-span-2 hidden min-w-0 truncate font-mono text-sm text-(--content-meta) md:block">
         {formatModifiedDateTime(c.lastModifiedDateTime)}
       </div>
-      <div className="col-span-1 hidden shrink-0 truncate font-mono text-sm text-(--content-meta) md:block">
+      <div className="col-span-1 hidden min-w-0 truncate font-mono text-sm text-(--content-meta) md:block">
         {humanFileSize(c.size)}
       </div>
     </div>
@@ -65,19 +67,15 @@ const FolderRow = ({
   return (
     <div
       ref={ref}
-      className="card-glare-host onload-animation relative grid grid-cols-12 transition-all duration-300 ease-in-out hover:bg-(--btn-plain-bg-hover) hover:pl-1"
+      className="card-glare-host onload-animation relative grid grid-cols-12 items-center transition-all duration-300 ease-in-out hover:bg-(--btn-plain-bg-hover) hover:pl-1"
       style={{ animationDelay: `${Math.min(index, 15) * 40}ms` }}
     >
-      <Link
-        href={getItemPath(c.name)}
-        passHref
-        className="col-span-12 md:col-span-10"
-      >
+      <Link href={getItemPath(c.name)} passHref className="col-span-12 md:col-span-10">
         <FileListItem fileContent={c} />
       </Link>
 
       {c.folder ? (
-        <div className="hidden p-1.5 text-(--content-main) md:flex">
+        <div className="col-span-2 hidden items-center justify-end py-2.5 pr-3 text-(--content-main) md:flex">
           <span
             title="Copy folder permalink"
             role="button"
@@ -116,7 +114,7 @@ const FolderRow = ({
           )}
         </div>
       ) : (
-        <div className="hidden p-1.5 text-(--content-main) md:flex">
+        <div className="col-span-2 hidden items-center justify-end py-2.5 pr-3 text-(--content-main) md:flex">
           <span
             title="Copy raw file permalink"
             role="button"
@@ -158,17 +156,17 @@ const FolderListLayout = ({
 
   return (
     <div className="card-base overflow-hidden text-(--content-main)">
-      <div className="grid grid-cols-12 items-center space-x-2 border-b border-(--line-divider) px-3">
-        <div className="col-span-12 py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:col-span-6">
+      <div className="grid grid-cols-12 items-center border-b border-(--line-divider) px-3">
+        <div className="col-span-12 py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:col-span-7">
           Name
         </div>
-        <div className="col-span-3 hidden text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
+        <div className="col-span-2 hidden py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
           Last Modified
         </div>
-        <div className="hidden text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
+        <div className="col-span-1 hidden py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
           Size
         </div>
-        <div className="hidden text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
+        <div className="col-span-2 hidden py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
           Actions
         </div>
       </div>
