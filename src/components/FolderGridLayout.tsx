@@ -176,7 +176,7 @@ const FolderGridLayout = ({
 
   return (
     <div className="card-base overflow-hidden text-(--content-main)">
-      <div className="flex items-center border-b border-(--line-divider) px-5 text-xs font-bold uppercase tracking-widest text-(--content-meta)">
+      <div className="flex items-center border-b border-(--line-divider) px-5 py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta)">
         <div className="flex-1">{folderChildren.length} items</div>
       </div>
 
