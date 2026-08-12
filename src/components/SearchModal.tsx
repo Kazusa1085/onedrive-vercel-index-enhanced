@@ -1,9 +1,10 @@
 import axios from 'axios'
 import useSWR, { SWRResponse } from 'swr'
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, Fragment, useRef, useState } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { useAsync } from 'react-async-hook'
 import useConstant from 'use-constant'
+import { Dialog, Transition } from '@headlessui/react'
 
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -182,75 +183,81 @@ export default function SearchModal({
   const { query, setQuery, results } = useDriveItemSearch()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const closeSearchBox = useCallback(() => {
+  const closeSearchBox = () => {
     setSearchOpen(false)
     setQuery('')
-  }, [setSearchOpen, setQuery])
-
-  // Close on Escape and focus the input whenever the modal opens.
-  useEffect(() => {
-    if (!searchOpen) return
-    inputRef.current?.focus()
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeSearchBox()
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [searchOpen, closeSearchBox])
-
-  if (!searchOpen) return null
+  }
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events -- click-outside catcher; keyboard users close via Escape (window keydown below)
-    <div className="fixed inset-0 z-[999] overflow-y-auto" onClick={closeSearchBox} role="dialog" aria-modal="true">
-      <div className="fixed inset-0 bg-white/80 dark:bg-gray-800/80" aria-hidden="true" />
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- click-outside catcher; Escape closes the modal for keyboard users */}
-      <div className="flex min-h-full items-start justify-center px-4 py-12" onClick={closeSearchBox}>
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- stopPropagation only, no interaction of its own */}
-        <div
-          className="relative w-full max-w-3xl transform overflow-hidden rounded-sm border border-gray-400/30 bg-white text-left shadow-xl dark:bg-gray-900 dark:text-white"
-          onClick={e => e.stopPropagation()}
+    <Transition appear show={searchOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-[999]" onClose={closeSearchBox} initialFocus={inputRef}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-100"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-75"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
         >
-          <div className="flex items-center space-x-4 border-b border-gray-400/30 bg-gray-50 p-4 dark:bg-gray-800">
-            <FontAwesomeIcon icon="search" className="h-4 w-4" />
-            <input
-              type="text"
-              id="search-box"
-              ref={inputRef}
-              autoFocus
-              className="w-full bg-transparent focus:outline-hidden focus-visible:outline-hidden"
-              placeholder="Search ..."
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-            />
-            <div className="rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium dark:bg-gray-700">ESC</div>
-          </div>
-          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- result area click closes the search; Escape also works */}
-          <div
-            className="max-h-[80vh] overflow-x-hidden overflow-y-scroll"
-            onClick={closeSearchBox}
-          >
-            {results.loading && (
-              <div className="px-4 py-12 text-center text-sm font-medium">
-                <LoadingIcon className="svg-inline--fa mr-2 inline-block h-4 w-4 animate-spin" />
-                <span>Loading ...</span>
-              </div>
-            )}
-            {results.error && (
-              <div className="text-center px-4 py-12 text-sm font-medium">Error: {results.error.message}</div>
-            )}
-            {results.result && (
-              <>
-                {results.result.length === 0 ? (
-                  <div className="px-4 py-12 text-center text-sm font-medium">{'Nothing here.'}</div>
-                ) : (
-                  results.result.map(result => <SearchResultItem key={result.id} result={result} />)
-                )}
-              </>
-            )}
+          <div className="fixed inset-0 bg-white/80 dark:bg-gray-800/80" aria-hidden="true" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-start justify-center px-4 py-12">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-100"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-75"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-95 scale-95"
+            >
+              <Dialog.Panel className="relative w-full max-w-3xl transform overflow-hidden rounded-sm border border-gray-400/30 bg-white text-left shadow-xl dark:bg-gray-900 dark:text-white">
+                <Dialog.Title className="sr-only">Search files</Dialog.Title>
+                <div className="flex items-center space-x-4 border-b border-gray-400/30 bg-gray-50 p-4 dark:bg-gray-800">
+                  <FontAwesomeIcon icon="search" className="h-4 w-4" />
+                  <label className="sr-only" htmlFor="search-box">
+                    Search files
+                  </label>
+                  <input
+                    type="text"
+                    id="search-box"
+                    ref={inputRef}
+                    className="w-full bg-transparent focus:outline-hidden focus-visible:outline-hidden"
+                    placeholder="Search ..."
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                  />
+                  <div className="rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium dark:bg-gray-700">ESC</div>
+                </div>
+                {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- result area click closes the search; Escape also works */}
+                <div className="max-h-[80vh] overflow-x-hidden overflow-y-scroll" onClick={closeSearchBox}>
+                  {results.loading && (
+                    <div className="px-4 py-12 text-center text-sm font-medium">
+                      <LoadingIcon className="svg-inline--fa mr-2 inline-block h-4 w-4 animate-spin" />
+                      <span>Loading ...</span>
+                    </div>
+                  )}
+                  {results.error && (
+                    <div className="text-center px-4 py-12 text-sm font-medium">Error: {results.error.message}</div>
+                  )}
+                  {results.result && (
+                    <>
+                      {results.result.length === 0 ? (
+                        <div className="px-4 py-12 text-center text-sm font-medium">{'Nothing here.'}</div>
+                      ) : (
+                        results.result.map(result => <SearchResultItem key={result.id} result={result} />)
+                      )}
+                    </>
+                  )}
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
-      </div>
-    </div>
+      </Dialog>
+    </Transition>
   )
 }

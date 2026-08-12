@@ -120,9 +120,32 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
 
   if (error) {
     if (error.status === 403) return <div />
+    if (error.status === 401) {
+      return (
+        <PreviewContainer>
+          <Auth redirect={path} />
+        </PreviewContainer>
+      )
+    }
+    if (error.status === 404) {
+      return (
+        <PreviewContainer>
+          <FourOhFour
+            title="File not found"
+            message="The file or folder may have been moved, renamed, or deleted."
+            details={JSON.stringify(error.message)}
+          />
+        </PreviewContainer>
+      )
+    }
     return (
       <PreviewContainer>
-        {error.status === 401 ? <Auth redirect={path} /> : <FourOhFour errorMsg={JSON.stringify(error.message)} />}
+        <FourOhFour
+          title="Couldn't load this folder"
+          message="Something went wrong while loading the directory. Check your connection and try again."
+          details={JSON.stringify(error.message)}
+          onRetry={() => router.reload()}
+        />
       </PreviewContainer>
     )
   }
@@ -284,7 +307,11 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
 
   return (
     <PreviewContainer>
-      <FourOhFour errorMsg={`Cannot preview ${path}`} />
+      <FourOhFour
+        title="Cannot preview this file"
+        message="This file type is not supported for preview."
+        details={path}
+      />
     </PreviewContainer>
   )
 }

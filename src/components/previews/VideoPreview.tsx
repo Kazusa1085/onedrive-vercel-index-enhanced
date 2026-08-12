@@ -119,7 +119,11 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
       <CustomEmbedLinkMenu path={asPath} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <PreviewContainer>
         {error ? (
-          <FourOhFour errorMsg={error.message} />
+          <FourOhFour
+            title="Video could not be loaded"
+            message="The player failed to load this video. You can still download it below."
+            details={error.message}
+          />
         ) : loading && isFlv ? (
           <Loading loadingText={'Loading FLV extension...'} />
         ) : (

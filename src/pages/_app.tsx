@@ -50,16 +50,91 @@ import {
   faTh,
   faThList,
 } from '@fortawesome/free-solid-svg-icons'
-import * as Icons from '@fortawesome/free-brands-svg-icons'
+import {
+  faGithub,
+  faXTwitter,
+  faTwitter,
+  faBilibili,
+  faYoutube,
+  faTelegram,
+  faInstagram,
+  faDiscord,
+  faReddit,
+  faMastodon,
+  faSteam,
+  faTwitch,
+  faSpotify,
+  faSoundcloud,
+  faTiktok,
+  faApple,
+  faGoogle,
+  faMicrosoft,
+  faSkype,
+  faSlack,
+  faWhatsapp,
+  faAmazon,
+  faPaypal,
+  faPatreon,
+  faKickstarter,
+  faPinterest,
+  faVk,
+  faStackOverflow,
+  faGitlab,
+  faDropbox,
+  faEtsy,
+  faWeibo,
+  faZhihu,
+  faQq,
+  faWeixin,
+  faGitee,
+  faAlipay,
+} from '@fortawesome/free-brands-svg-icons'
 
 import type { AppProps } from 'next/app'
 import NextNProgress from 'nextjs-progressbar'
 import Background from '../components/Background'
 
-// import all brand icons with tree-shaking so all icons can be referenced in the app
-const iconList = Object.keys(Icons)
-  .filter(k => k !== 'fab' && k !== 'prefix')
-  .map(icon => Icons[icon])
+// Brand icons are imported explicitly: the social links in siteConfig can use
+// any of these common platform icons without shipping the full brand icon set.
+const brandIcons = [
+  faGithub,
+  faXTwitter,
+  faTwitter,
+  faBilibili,
+  faYoutube,
+  faTelegram,
+  faInstagram,
+  faDiscord,
+  faReddit,
+  faMastodon,
+  faSteam,
+  faTwitch,
+  faSpotify,
+  faSoundcloud,
+  faTiktok,
+  faApple,
+  faGoogle,
+  faMicrosoft,
+  faSkype,
+  faSlack,
+  faWhatsapp,
+  faAmazon,
+  faPaypal,
+  faPatreon,
+  faKickstarter,
+  faPinterest,
+  faVk,
+  faStackOverflow,
+  faGitlab,
+  faDropbox,
+  faEtsy,
+  faWeibo,
+  faZhihu,
+  faQq,
+  faWeixin,
+  faGitee,
+  faAlipay,
+]
 
 library.add(
   faFileImage,
@@ -99,7 +174,7 @@ library.add(
   faTh,
   faThList,
   faPen,
-  ...iconList
+  ...brandIcons
 )
 
 function MyApp({ Component, pageProps }: AppProps) {

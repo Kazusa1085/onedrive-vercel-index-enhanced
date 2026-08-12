@@ -43,7 +43,6 @@ const CODE_BLOCK_STYLE: CSSProperties = {
   border: '1px solid oklch(0.7 0.14 var(--hue) / 0.28)',
   borderLeft: '3px solid var(--primary)',
   borderRadius: '0.75rem',
-  boxShadow: 'var(--card-shadow)',
 }
 
 const RAW_HTML_SANITIZE_PLUGINS: NonNullable<Options['rehypePlugins']> = [rehypeRaw, [rehypeSanitize, defaultSchema]]
@@ -86,6 +85,11 @@ const MarkdownPreview: FC<{
   }
   // Custom renderer:
   const customRenderer = {
+    // react-markdown wraps fenced code in a <pre>. SyntaxHighlighter supplies
+    // the actual code frame, so remove this wrapper to avoid nested backgrounds.
+    pre({ children }: { children: ReactNode }) {
+      return <>{children}</>
+    },
     // img: to render images in markdown with relative file paths
     img: ({
       alt,
@@ -142,7 +146,14 @@ const MarkdownPreview: FC<{
       const rawLanguage = (match ? match[1] : 'text').toLowerCase()
       const language = LANGUAGE_ALIASES[rawLanguage] ?? rawLanguage
       return (
-        <SyntaxHighlighter language={language} style={tomorrowNight} customStyle={CODE_BLOCK_STYLE} PreTag="div" {...props}>
+        <SyntaxHighlighter
+          language={language}
+          style={tomorrowNight}
+          customStyle={CODE_BLOCK_STYLE}
+          codeTagProps={{ className: 'code-block-content' }}
+          PreTag="div"
+          {...props}
+        >
           {String(children).replace(/\n$/, '')}
         </SyntaxHighlighter>
       )

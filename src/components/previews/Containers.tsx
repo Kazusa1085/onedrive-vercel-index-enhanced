@@ -37,7 +37,11 @@ export function PreviewState({
   if (error) {
     return (
       <PreviewContainer>
-        <FourOhFour errorMsg={error} />
+        <FourOhFour
+          title="Failed to load the preview"
+          message="The preview could not be loaded. Check your connection and try again."
+          details={error}
+        />
       </PreviewContainer>
     )
   }
@@ -51,7 +55,7 @@ export function PreviewState({
   if (empty) {
     return (
       <PreviewContainer>
-        <FourOhFour errorMsg={'File is empty.'} />
+        <FourOhFour title="File is empty" message="This file has no content to preview." />
       </PreviewContainer>
     )
   }
