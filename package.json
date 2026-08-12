@@ -27,7 +27,7 @@
     "emoji-regex": "^10.6.0",
     "ioredis": "^5.10.1",
     "jszip": "^3.10.1",
-    "katex": "0.18.4",
+    "katex": "0.16.46",
     "mpegts.js": "^1.8.0",
     "nextjs-progressbar": "^0.0.16",
     "pdfjs-dist": "^6.2.108",

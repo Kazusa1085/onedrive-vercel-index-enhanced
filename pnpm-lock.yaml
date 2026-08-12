@@ -59,8 +59,8 @@ importers:
         specifier: ^3.10.1
         version: 3.10.1
       katex:
-        specifier: 0.18.4
-        version: 0.18.4
+        specifier: 0.16.46
+        version: 0.16.46
       mpegts.js:
         specifier: ^1.8.0
         version: 1.8.1
@@ -2165,10 +2165,6 @@ packages:
 
   katex@0.16.46:
     resolution: {integrity: sha512-WHy4Coo+bGZyH7NwJKHkS04YFsFcarWbAEOAC3EMndzdN6VSZqklLLIgfxzyaW9jDoeGYJX9SWbJPKpecox0Uw==}
-    hasBin: true
-
-  katex@0.18.4:
-    resolution: {integrity: sha512-IMPntbRLOU+eu88XDiFKqQ8Akhr9Tv7jDMXqPhjG9SI1JMA4DIgXk4x9k4skJz2NZJXBRbC+2pYBLj9olqcZow==}
     hasBin: true
 
   keyv@4.5.4:
@@ -5386,10 +5382,6 @@ snapshots:
       setimmediate: 1.0.5
 
   katex@0.16.46:
-    dependencies:
-      commander: 8.3.0
-
-  katex@0.18.4:
     dependencies:
       commander: 8.3.0
 
