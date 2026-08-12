@@ -52,6 +52,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faGithub,
+  faMarkdown,
   faXTwitter,
   faTwitter,
   faBilibili,
@@ -98,6 +99,7 @@ import Background from '../components/Background'
 // any of these common platform icons without shipping the full brand icon set.
 const brandIcons = [
   faGithub,
+  faMarkdown,
   faXTwitter,
   faTwitter,
   faBilibili,
