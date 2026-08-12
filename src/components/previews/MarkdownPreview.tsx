@@ -12,6 +12,7 @@ import 'katex/dist/katex.min.css'
 
 import siteConfig from '../../../config/site.config'
 import useFileContent from '../../utils/fetchOnMount'
+import { getStoredToken } from '../../utils/protectedRouteHandler'
 import DownloadButtonGroup from '../DownloadBtnGtoup'
 import { DownloadBtnContainer, PreviewContainer, PreviewState } from './Containers'
 import type { OdFolderChildren } from '../../types'
@@ -28,6 +29,30 @@ const MarkdownPreview: FC<{
 
   // Check if the image is relative path instead of a absolute url
   const isUrlAbsolute = (url: string | string[]) => url.indexOf('://') > 0 || url.indexOf('//') === 0
+  // Token for protected-route images (the `raw=true` endpoint only accepts the
+  // token via the `odpt` query parameter).
+  const imageToken = getStoredToken(parentPath)
+  // Build a URL for a relative image path. `parentPath` is already
+  // percent-encoded while the markdown `src` is not, so decode the parent
+  // first and re-encode every path segment (this keeps spaces, CJK characters,
+  // '#' and '&' inside file names intact).
+  const buildRelativeImageUrl = (src: string) => {
+    const decodedParent = parentPath
+      .split('/')
+      .map(segment => {
+        try {
+          return decodeURIComponent(segment)
+        } catch {
+          return segment
+        }
+      })
+      .join('/')
+    const encodedPath = `${decodedParent}/${src}`
+      .split('/')
+      .map(encodeURIComponent)
+      .join('/')
+    return `/api/?path=${encodedPath}&raw=true${imageToken ? `&odpt=${imageToken}` : ''}`
+  }
   // Custom renderer:
   const customRenderer = {
     // img: to render images in markdown with relative file paths
@@ -50,7 +75,7 @@ const MarkdownPreview: FC<{
         // eslint-disable-next-line @next/next/no-img-element
         <img
           alt={alt}
-          src={isUrlAbsolute(src as string) ? src : `/api/?path=${parentPath}/${src}&raw=true`}
+          src={isUrlAbsolute(src as string) ? src : buildRelativeImageUrl(src as string)}
           title={title}
           width={width}
           height={height}
