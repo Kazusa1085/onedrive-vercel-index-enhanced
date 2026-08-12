@@ -54,7 +54,7 @@ const FolderRow = ({
       <Link
         href={getItemPath(c.name)}
         passHref
-        className="col-span-12 flex min-w-0 items-center space-x-2 py-2.5 md:col-span-6"
+        className="col-span-7 flex min-w-0 items-center space-x-2 py-2.5 md:col-span-6"
         title={c.name}
       >
         <div className="w-5 shrink-0 text-center">
@@ -66,74 +66,105 @@ const FolderRow = ({
       <div className="col-span-3 hidden min-w-0 truncate py-2.5 font-mono text-sm text-(--content-meta) md:block">
         {formatModifiedDateTime(c.lastModifiedDateTime)}
       </div>
-      <div className="col-span-1 hidden min-w-0 truncate py-2.5 font-mono text-sm text-(--content-meta) md:block">
+      <div className="col-span-3 min-w-0 truncate py-2.5 font-mono text-sm text-(--content-meta) md:col-span-1">
         {humanFileSize(c.size)}
       </div>
 
       {c.folder ? (
-        <div className="col-span-2 hidden items-center justify-end py-2.5 text-(--content-main) md:flex">
+        <div className="col-span-2 flex items-center justify-end py-2.5 text-(--content-main)">
+          {/* Mobile: download only */}
           <span
-            title="Copy folder permalink"
+            title="Download folder"
             role="button"
             tabIndex={0}
             onKeyDown={activateOnKeyDown(() => {
-              clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
-              toast('Copied folder permalink.', { icon: '👌' })
+              const p = getItemPath(c.name)
+              handleFolderDownload(p, c.id, c.name)()
             })}
-            className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+            className="btn-plain cursor-pointer rounded-sm px-1.5 py-1 md:hidden"
             onClick={() => {
-              clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
-              toast('Copied folder permalink.', { icon: '👌' })
+              const p = getItemPath(c.name)
+              handleFolderDownload(p, c.id, c.name)()
             }}
           >
-            <FontAwesomeIcon icon={['far', 'copy']} />
+            <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
           </span>
-          {folderGenerating[c.id] ? (
-            <Downloading title={'Downloading folder, refresh page to cancel'} style="px-1.5 py-1" />
-          ) : (
+          {/* Desktop: full actions */}
+          <div className="hidden items-center gap-1 md:flex">
             <span
-              title="Download folder"
+              title="Copy folder permalink"
               role="button"
               tabIndex={0}
               onKeyDown={activateOnKeyDown(() => {
-                const p = getItemPath(c.name)
-                handleFolderDownload(p, c.id, c.name)()
+                clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
+                toast('Copied folder permalink.', { icon: '👌' })
               })}
               className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
               onClick={() => {
-                const p = getItemPath(c.name)
-                handleFolderDownload(p, c.id, c.name)()
+                clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
+                toast('Copied folder permalink.', { icon: '👌' })
               }}
             >
-              <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
+              <FontAwesomeIcon icon={['far', 'copy']} />
             </span>
-          )}
+            {folderGenerating[c.id] ? (
+              <Downloading title={'Downloading folder, refresh page to cancel'} style="px-1.5 py-1" />
+            ) : (
+              <span
+                title="Download folder"
+                role="button"
+                tabIndex={0}
+                onKeyDown={activateOnKeyDown(() => {
+                  const p = getItemPath(c.name)
+                  handleFolderDownload(p, c.id, c.name)()
+                })}
+                className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+                onClick={() => {
+                  const p = getItemPath(c.name)
+                  handleFolderDownload(p, c.id, c.name)()
+                }}
+              >
+                <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
+              </span>
+            )}
+          </div>
         </div>
       ) : (
-        <div className="col-span-2 hidden items-center justify-end py-2.5 text-(--content-main) md:flex">
-          <span
-            title="Copy raw file permalink"
-            role="button"
-            tabIndex={0}
-            onKeyDown={activateOnKeyDown(() => {
-              clipboard.copy(buildRawUrl(getItemPath(c.name)))
-              toast.success('Copied raw file permalink.')
-            })}
-            className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
-            onClick={() => {
-              clipboard.copy(buildRawUrl(getItemPath(c.name)))
-              toast.success('Copied raw file permalink.')
-            }}
-          >
-            <FontAwesomeIcon icon={['far', 'copy']} />
-          </span>
+        <div className="col-span-2 flex items-center justify-end py-2.5 text-(--content-main)">
+          {/* Mobile: download only */}
           <a
             title="Download file"
-            className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+            className="btn-plain cursor-pointer rounded-sm px-1.5 py-1 md:hidden"
             href={buildRawUrl(getItemPath(c.name))}
           >
             <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
           </a>
+          {/* Desktop: full actions */}
+          <div className="hidden items-center gap-1 md:flex">
+            <span
+              title="Copy raw file permalink"
+              role="button"
+              tabIndex={0}
+              onKeyDown={activateOnKeyDown(() => {
+                clipboard.copy(buildRawUrl(getItemPath(c.name)))
+                toast.success('Copied raw file permalink.')
+              })}
+              className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+              onClick={() => {
+                clipboard.copy(buildRawUrl(getItemPath(c.name)))
+                toast.success('Copied raw file permalink.')
+              }}
+            >
+              <FontAwesomeIcon icon={['far', 'copy']} />
+            </span>
+            <a
+              title="Download file"
+              className="btn-plain cursor-pointer rounded-sm px-1.5 py-1"
+              href={buildRawUrl(getItemPath(c.name))}
+            >
+              <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
+            </a>
+          </div>
         </div>
       )}
       <div className="card-glare" />
@@ -153,17 +184,18 @@ const FolderListLayout = ({
   return (
     <div className="card-base overflow-hidden text-(--content-main)">
       <div className="grid grid-cols-12 items-center border-b border-(--line-divider) px-5">
-        <div className="col-span-12 py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:col-span-6">
+        <div className="col-span-7 py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:col-span-6">
           Name
         </div>
         <div className="col-span-3 hidden py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
           Last Modified
         </div>
-        <div className="col-span-1 hidden py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
+        <div className="col-span-3 py-2 text-xs font-bold uppercase tracking-widest text-(--content-meta) md:col-span-1">
           Size
         </div>
-        <div className="col-span-2 hidden py-2 text-right text-xs font-bold uppercase tracking-widest text-(--content-meta) md:block">
-          Actions
+        <div className="col-span-2 py-2 text-right text-xs font-bold uppercase tracking-widest text-(--content-meta)">
+          <span className="md:hidden">Act</span>
+          <span className="hidden md:inline">Actions</span>
         </div>
       </div>
 
