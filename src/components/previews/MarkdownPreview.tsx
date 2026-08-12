@@ -1,6 +1,6 @@
 import { FC, CSSProperties, ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
-import type { Components } from 'react-markdown'
+import type { Components, ExtraProps } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
@@ -58,17 +58,23 @@ const MarkdownPreview: FC<{
         />
       )
     },
-    // code: to render code blocks with react-syntax-highlighter
+    // code: to render code blocks with react-syntax-highlighter.
+    // Note: react-markdown v10 no longer passes the `inline` prop, so inline
+    // code is detected by the absence of a language class and a single-line
+    // node position (fenced blocks always carry `language-*` when annotated).
     code({
       className,
       children,
-      inline,
+      node,
       ...props
     }: {
       className?: string | undefined
       children: ReactNode
-      inline?: boolean
+      node?: ExtraProps['node']
     }) {
+      const match = /language-(\w+)/.exec(className || '')
+      const inline = !match && (!node?.position || node.position.start.line === node.position.end.line)
+
       if (inline) {
         return (
           <code className={className} {...props}>
@@ -77,7 +83,6 @@ const MarkdownPreview: FC<{
         )
       }
 
-      const match = /language-(\w+)/.exec(className || '')
       return (
         <SyntaxHighlighter language={match ? match[1] : 'language-text'} style={tomorrowNight} PreTag="div" {...props}>
           {String(children).replace(/\n$/, '')}
