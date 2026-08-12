@@ -97,7 +97,7 @@ const Navbar = () => {
                 href={l.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-plain flex items-center space-x-2 px-2.5 py-1.5"
+                className="btn-plain flex items-center gap-2 px-2.5 py-1.5"
               >
                 <FontAwesomeIcon className="h-4 w-4" icon={['fab', l.name.toLowerCase() as IconName]} />
                 <span className="hidden text-sm font-medium md:inline-block">{l.name}</span>
@@ -107,7 +107,7 @@ const Navbar = () => {
           {siteConfig.email && (
             <a
               href={siteConfig.email}
-              className="btn-plain flex items-center space-x-2 px-2.5 py-1.5"
+              className="btn-plain flex items-center gap-2 px-2.5 py-1.5"
             >
               <FontAwesomeIcon className="h-4 w-4" icon={['far', 'envelope']} />
               <span className="hidden text-sm font-medium md:inline-block">{'Email'}</span>
@@ -116,7 +116,7 @@ const Navbar = () => {
 
           {tokenPresent && (
             <button
-              className="btn-plain flex items-center space-x-2 px-2.5 py-1.5"
+              className="btn-plain flex items-center gap-2 px-2.5 py-1.5"
               onClick={() => setIsOpen(true)}
             >
               <span className="hidden text-sm font-medium md:inline-block">{'Logout'}</span>
