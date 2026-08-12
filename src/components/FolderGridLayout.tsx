@@ -176,11 +176,11 @@ const FolderGridLayout = ({
 
   return (
     <div className="card-base overflow-hidden text-(--content-main)">
-      <div className="flex items-center border-b border-(--line-divider) px-3 text-xs font-bold uppercase tracking-widest text-(--content-meta)">
+      <div className="flex items-center border-b border-(--line-divider) px-5 text-xs font-bold uppercase tracking-widest text-(--content-meta)">
         <div className="flex-1">{folderChildren.length} items</div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 p-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 px-5 py-4 md:grid-cols-4">
         {folderChildren.map((c: OdFolderChildren, i: number) => (
           <FolderGridItem
             key={c.id}
