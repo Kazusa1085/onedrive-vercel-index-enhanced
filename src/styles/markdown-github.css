@@ -3,9 +3,15 @@
   -webkit-text-size-adjust: 100%;
   line-height: 1.5;
   color: #24292e;
-  background-color: #ffffff;
+  /* Glassmorphism card, matching the site design system (see .card-base in globals.css) */
+  background-color: var(--card-bg-transparent, rgba(255, 255, 255, 0.78));
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border-radius: var(--radius-large, 1rem);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--card-shadow, 0 6px 24px rgba(30, 10, 20, 0.08));
+  padding: 1rem 1.25rem;
   font-size: 16px;
-  line-height: 1.5;
   word-wrap: break-word;
 }
 
@@ -708,12 +714,12 @@
 }
 
 .markdown-body table tr {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.35);
   border-top: 1px solid #c6cbd1;
 }
 
 .markdown-body table tr:nth-child(2n) {
-  background-color: #f6f8fa;
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .markdown-body img {
@@ -934,7 +940,7 @@
     /* color: #c9d1d9; */
     /* background-color: #0d1117; */
     color: #f3f4f6;
-    background-color: #18181b;
+    background-color: var(--card-bg-transparent, rgba(23, 23, 23, 0.78));
   }
   .markdown-body a {
     color: rgba(2, 132, 199);
@@ -1074,11 +1080,11 @@
     border: 1px solid #3b434b;
   }
   .markdown-body table tr {
-    background-color: #0d1117;
+    background-color: rgba(255, 255, 255, 0.04);
     border-top: 1px solid #272c32;
   }
   .markdown-body table tr:nth-child(2n) {
-    background-color: #161b22;
+    background-color: rgba(255, 255, 255, 0.06);
   }
   .markdown-body img {
     background-color: #0d1117;
