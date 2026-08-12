@@ -32,11 +32,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, fileSize }) => {
 
     // Providing `length` lets pdf.js skip the initial whole-file probe and
     // start chunked range requests immediately, avoiding slow full downloads
-    // that time out on mobile connections.
+    // that time out on mobile connections. A per-attempt cache-buster keeps
+    // reloads from reusing stale browser cache entries for chunk responses.
+    const cacheBustedUrl = `${url}${url.includes('?') ? '&' : '?'}_r=${Date.now()}`
     const params =
       mode === 'range'
-        ? { url, rangeChunkSize: 65536, ...(fileSize && fileSize > 0 ? { length: fileSize } : {}) }
-        : { url, disableRange: true }
+        ? { url: cacheBustedUrl, rangeChunkSize: 65536, ...(fileSize && fileSize > 0 ? { length: fileSize } : {}) }
+        : { url: cacheBustedUrl, disableRange: true }
 
     pdfjs
       .getDocument(params)

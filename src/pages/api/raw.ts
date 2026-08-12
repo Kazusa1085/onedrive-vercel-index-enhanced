@@ -111,9 +111,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Range responses (used by pdf.js to stream PDFs in chunks) must never
         // be cached on the edge either: Vercel's cache key does not include the
         // Range header, so a cached chunk would be served to a different range
-        // request and corrupt the document.
+        // request and corrupt the document. PDFs are private content and are
+        // fully excluded from shared caches; stale-while-revalidate can
+        // otherwise keep serving an aborted/partial response on refresh.
         odHeaders['Cache-Control'] =
-          req.headers.range || message !== '' ? 'no-store' : cacheControlHeader
+          /\.pdf$/i.test(cleanPath) || req.headers.range || message !== '' ? 'no-store' : cacheControlHeader
         // Send data stream as response (pass through 206 Partial Content,
         // a 200 here would confuse the browser's range logic)
         res.writeHead(status ?? 200, odHeaders)

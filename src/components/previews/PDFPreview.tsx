@@ -14,8 +14,8 @@ const PDFEmbedPreview: FC<{ file: OdFileObject }> = ({ file: _file }) => {
   // many mobile browsers (especially Chinese ones like QQ/UC/Quark) ignore
   // iframes pointing at PDFs and fall back to downloading the file, while the
   // pdf.js based viewer renders the document itself so it always previews.
-  // `proxy=true` streams small files (<4MB) through raw.ts itself, keeping a
-  // stable `application/pdf` response; larger files redirect to the CDN.
+  // `proxy=true` streams the file through raw.ts, keeping a stable
+  // `application/pdf` response with CORS headers.
   // Note: `asPath` is already URL-encoded; it must be interpolated verbatim,
   // the same way the other previews build their raw URLs. Wrapping it in
   // encodeURIComponent double-encodes (e.g. '%20' -> '%2520'), which makes
