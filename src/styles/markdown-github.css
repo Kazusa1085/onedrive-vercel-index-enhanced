@@ -3,14 +3,8 @@
   -webkit-text-size-adjust: 100%;
   line-height: 1.5;
   color: #24292e;
-  /* Glassmorphism card, matching the site design system (see .card-base in globals.css) */
-  background-color: var(--card-bg-transparent, rgba(255, 255, 255, 0.78));
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  border-radius: var(--radius-large, 1rem);
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.08));
-  box-shadow: var(--card-shadow, 0 6px 24px rgba(30, 10, 20, 0.08));
-  padding: 1rem 1.25rem;
+  /* Transparent: the surrounding PreviewContainer (card-base) is the glass card. */
+  background-color: transparent;
   font-size: 16px;
   word-wrap: break-word;
 }
@@ -940,7 +934,7 @@
     /* color: #c9d1d9; */
     /* background-color: #0d1117; */
     color: #f3f4f6;
-    background-color: var(--card-bg-transparent, rgba(23, 23, 23, 0.78));
+    background-color: transparent;
   }
   .markdown-body a {
     color: rgba(2, 132, 199);
