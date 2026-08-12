@@ -17,6 +17,23 @@ import DownloadButtonGroup from '../DownloadBtnGtoup'
 import { DownloadBtnContainer, PreviewContainer, PreviewState } from './Containers'
 import type { OdFolderChildren } from '../../types'
 
+// The light-async loader table only knows canonical hljs names (e.g.
+// 'typescript'), not the short tags used in markdown fences ('ts', 'js'...).
+// Map them here; unknown languages simply render without highlighting.
+const LANGUAGE_ALIASES: Record<string, string> = {
+  ts: 'typescript',
+  js: 'javascript',
+  jsx: 'javascript',
+  py: 'python',
+  sh: 'shell',
+  zsh: 'shell',
+  yml: 'yaml',
+  htm: 'xml',
+  md: 'markdown',
+  txt: 'plaintext',
+  text: 'plaintext',
+}
+
 const MarkdownPreview: FC<{
   file: OdFolderChildren
   path: string
@@ -97,7 +114,7 @@ const MarkdownPreview: FC<{
       children: ReactNode
       node?: ExtraProps['node']
     }) {
-      const match = /language-(\w+)/.exec(className || '')
+      const match = /language-([\w+-]+)/.exec(className || '')
       const inline = !match && (!node?.position || node.position.start.line === node.position.end.line)
 
       if (inline) {
@@ -108,8 +125,10 @@ const MarkdownPreview: FC<{
         )
       }
 
+      const rawLanguage = (match ? match[1] : 'text').toLowerCase()
+      const language = LANGUAGE_ALIASES[rawLanguage] ?? rawLanguage
       return (
-        <SyntaxHighlighter language={match ? match[1] : 'language-text'} style={tomorrowNight} PreTag="div" {...props}>
+        <SyntaxHighlighter language={language} style={tomorrowNight} PreTag="div" {...props}>
           {String(children).replace(/\n$/, '')}
         </SyntaxHighlighter>
       )
