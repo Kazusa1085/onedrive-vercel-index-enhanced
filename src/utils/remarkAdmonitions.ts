@@ -1,5 +1,7 @@
 // Match GitHub-style `> [!NOTE]` / `> [!WARNING]` first line inside a blockquote.
-const GITHUB_ADMONITION_RE = /^\s*\[!([a-zA-Z]+)\]\s*$/
+// GFM merges adjacent quote lines into one paragraph, so the marker may be
+// followed by `\n` and more content; match until the line break (or line end).
+const GITHUB_ADMONITION_RE = /^\s*\[!([a-zA-Z]+)\][ \t]*(?=\n|$)/
 
 const KNOWN_TYPES = ['note', 'tip', 'important', 'warning', 'caution']
 
