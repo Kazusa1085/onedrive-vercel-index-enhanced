@@ -42,7 +42,7 @@
 - Markdown 渲染说明：[docs/markdown.md](docs/markdown.md)
 - 完整配置说明：[docs/configuration.md](docs/configuration.md)
 
-> **注意**：本项目聚焦于展示和共享 OneDrive 中的文件，强调**免费**与**无服务器**。如果你有自己的服务器 / 需要 WebDAV / 使用其他云存储，可以看看 [OpenList](https://github.com/rwv/openlist)。
+> **注意**：本项目聚焦于展示和共享 OneDrive 中的文件，强调**免费**与**无服务器**。如果你有自己的服务器 / 需要 WebDAV / 使用其他云存储，可以看看 [OpenList](https://github.com/OpenListTeam/openlist)。
 
 ## 文档
 
