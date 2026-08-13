@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import type { Components, ExtraProps, Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
+import remarkDirective from 'remark-directive'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
@@ -15,6 +16,7 @@ import 'katex/dist/katex.min.css'
 import siteConfig from '../../../config/site.config'
 import useFileContent from '../../utils/fetchOnMount'
 import { getStoredToken } from '../../utils/protectedRouteHandler'
+import { remarkGithubAdmonitions } from '../../utils/remarkAdmonitions'
 import DownloadButtonGroup from '../DownloadBtnGtoup'
 import { DownloadBtnContainer, PreviewContainer, PreviewState } from './Containers'
 import type { OdFolderChildren } from '../../types'
@@ -36,7 +38,99 @@ const LANGUAGE_ALIASES: Record<string, string> = {
   text: 'plaintext',
 }
 
-const RAW_HTML_SANITIZE_PLUGINS: NonNullable<Options['rehypePlugins']> = [rehypeRaw, [rehypeSanitize, defaultSchema]]
+const RAW_HTML_SANITIZE_PLUGINS: NonNullable<Options['rehypePlugins']> = [
+  rehypeRaw,
+  [
+    rehypeSanitize,
+    {
+      ...defaultSchema,
+      attributes: {
+        ...(defaultSchema.attributes ?? {}),
+        div: [...((defaultSchema.attributes ?? {}).div ?? []), ['className', /^admonition/]],
+        span: [...((defaultSchema.attributes ?? {}).span ?? []), ['className', /^(spoiler|katex-)/]],
+      },
+    },
+  ],
+]
+
+const ADMONITION_TYPES = ['note', 'tip', 'important', 'warning', 'caution']
+
+// Minimal structural types for remark-directive nodes and the to-hast state;
+// the full types live in mdast-util-to-hast, which is not a direct dependency.
+interface DirectiveNode {
+  name: string
+  attributes?: Record<string, string | undefined>
+  children: unknown[]
+}
+interface DirectiveState {
+  all: (parent: unknown) => Array<Record<string, unknown>>
+}
+
+/**
+ * Spoiler: the content is hidden until the user clicks to reveal it.
+ */
+const Spoiler: FC<{ children: ReactNode }> = ({ children }) => {
+  const [revealed, setRevealed] = useState(false)
+  return (
+    <span
+      role="button"
+      tabIndex={0}
+      aria-expanded={revealed}
+      onClick={e => {
+        e.stopPropagation()
+        setRevealed(v => !v)
+      }}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          setRevealed(v => !v)
+        }
+      }}
+      className={`spoiler cursor-pointer rounded-sm px-1 transition-colors duration-200 ${
+        revealed ? 'bg-(--btn-plain-bg-hover)' : 'bg-(--content-main)/25 hover:bg-(--content-main)/40'
+      }`}
+    >
+      <span className={revealed ? 'visible' : 'invisible'}>{children}</span>
+    </span>
+  )
+}
+
+// Handlers for remark-directive nodes (`:::note` containers and `:spoiler`).
+// The context types come from remark-rehype's internal handler signature.
+const directiveHandlers = {
+  containerDirective(state: DirectiveState, node: DirectiveNode) {
+    const type = node.name
+    if (!ADMONITION_TYPES.includes(type)) {
+      return state.all(node)
+    }
+    const customTitle = node.attributes?.title
+    return {
+      type: 'element',
+      tagName: 'div',
+      properties: { className: ['admonition', `admonition-${type}`] },
+      children: [
+        {
+          type: 'element',
+          tagName: 'div',
+          properties: { className: ['admonition-title'] },
+          children: [{ type: 'text', value: customTitle ?? type.toUpperCase() }],
+        },
+        ...state.all(node),
+      ],
+    }
+  },
+  textDirective(state: DirectiveState, node: DirectiveNode) {
+    if (node.name === 'spoiler') {
+      return {
+        type: 'element',
+        tagName: 'span',
+        properties: { className: ['spoiler'] },
+        children: state.all(node),
+      }
+    }
+    return state.all(node)
+  },
+}
 
 /**
  * Fenced code block styled like the Kazusa blog's expressive-code blocks:
@@ -190,6 +284,18 @@ const MarkdownPreview: FC<{
       const language = LANGUAGE_ALIASES[rawLanguage] ?? rawLanguage
       return <CodeBlock language={language} code={String(children).replace(/\n$/, '')} />
     },
+    // span: intercept spoilers rendered by the textDirective handler; all
+    // other spans (including KaTeX internals) pass through untouched.
+    span({ className, children, node: _node, ...rest }) {
+      if (className?.includes('spoiler')) {
+        return <Spoiler>{children}</Spoiler>
+      }
+      return (
+        <span className={className} {...rest}>
+          {children}
+        </span>
+      )
+    },
   }
 
   if (error || validating) {
@@ -211,7 +317,8 @@ const MarkdownPreview: FC<{
           {/* Using rehypeRaw to render HTML inside Markdown is potentially dangerous.
               Controlled by siteConfig.allowRawHtmlInMarkdown (see config/site.config.js. #18) */}
           <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkMath]}
+            remarkPlugins={[remarkGfm, remarkMath, remarkDirective, remarkGithubAdmonitions]}
+            remarkRehypeOptions={{ handlers: directiveHandlers } as unknown as Options['remarkRehypeOptions']}
             rehypePlugins={siteConfig.allowRawHtmlInMarkdown ? [...RAW_HTML_SANITIZE_PLUGINS, rehypeKatex] : [rehypeKatex]}
             components={customRenderer as Components}
           >

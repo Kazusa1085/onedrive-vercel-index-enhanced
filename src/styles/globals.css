@@ -456,3 +456,42 @@ code[class*='language-'] {
     transform: translateY(0);
   }
 }
+
+/* ---- Admonitions (markdown `:::note` / `> [!NOTE]` blocks) ---- */
+.markdown-body .admonition {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background-color: color-mix(in oklab, var(--admonition-color) 12%, transparent);
+}
+.markdown-body .admonition-title {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--admonition-color);
+  margin-bottom: 0.5rem;
+}
+.markdown-body .admonition p:last-child {
+  margin-bottom: 0;
+}
+.admonition-note {
+  --admonition-color: oklch(0.62 0.15 250);
+}
+.admonition-tip {
+  --admonition-color: oklch(0.65 0.15 160);
+}
+.admonition-important {
+  --admonition-color: oklch(0.6 0.16 300);
+}
+.admonition-warning {
+  --admonition-color: oklch(0.7 0.16 85);
+}
+.admonition-caution {
+  --admonition-color: oklch(0.62 0.19 25);
+}
+
+/* Spoiler content stays hidden until clicked (the wrapper span toggles state) */
+.markdown-body .spoiler {
+  user-select: none;
+}
