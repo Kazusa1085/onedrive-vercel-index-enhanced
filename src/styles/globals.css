@@ -219,6 +219,11 @@ code[class*='language-'] {
   --glass-border: rgba(255, 255, 255, 0.08);
   --card-shadow: 0 6px 24px rgba(30, 10, 20, 0.08);
   --card-shadow-hover: 0 14px 38px rgba(30, 10, 20, 0.16);
+
+  /* Code block, adapted from the Kazusa blog's expressive-code theme */
+  --codeblock-bg: oklch(0.17 0.015 var(--hue));
+  --codeblock-topbar-bg: oklch(0.3 0.02 var(--hue));
+  --codeblock-selection: oklch(0.4 0.08 var(--hue));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -242,6 +247,9 @@ code[class*='language-'] {
     --glass-border: rgba(255, 255, 255, 0.12);
     --card-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     --card-shadow-hover: 0 14px 38px rgba(0, 0, 0, 0.5);
+
+    --codeblock-bg: oklch(0.17 0.015 var(--hue));
+    --codeblock-topbar-bg: oklch(0.12 0.015 var(--hue));
   }
 }
 

@@ -1,4 +1,4 @@
-import { FC, CSSProperties, ReactNode } from 'react'
+import { FC, CSSProperties, ReactNode, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Components, ExtraProps, Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -8,6 +8,7 @@ import rehypeRaw from 'rehype-raw'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/light-async'
 import { tomorrowNight } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import 'katex/dist/katex.min.css'
 
@@ -35,17 +36,60 @@ const LANGUAGE_ALIASES: Record<string, string> = {
   text: 'plaintext',
 }
 
-// Keep code readable with a dark syntax theme while tying its frame into the
-// site's hue-driven glass system.
-const CODE_BLOCK_STYLE: CSSProperties = {
-  margin: '1rem 0',
-  background: 'oklch(0.22 0.018 var(--hue) / 0.92)',
-  border: '1px solid oklch(0.7 0.14 var(--hue) / 0.28)',
-  borderLeft: '3px solid var(--primary)',
-  borderRadius: '0.75rem',
-}
-
 const RAW_HTML_SANITIZE_PLUGINS: NonNullable<Options['rehypePlugins']> = [rehypeRaw, [rehypeSanitize, defaultSchema]]
+
+/**
+ * Fenced code block styled like the Kazusa blog's expressive-code blocks:
+ * a top bar with the language name and a hover-revealed copy button, line
+ * numbers, and wrap-on-long-lines over the hue-tinted dark background.
+ */
+const CodeBlock: FC<{ language: string; code: string }> = ({ language, code }) => {
+  const [copied, setCopied] = useState(false)
+
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1000)
+    } catch {
+      // Clipboard unavailable; keep the button inert rather than failing loudly.
+    }
+  }
+
+  return (
+    <div className="code-block group my-4 overflow-hidden rounded-sm border border-(--line-divider)">
+      <div className="flex items-center justify-between bg-(--codeblock-topbar-bg) px-4 py-1.5">
+        <span className="font-mono text-xs font-medium uppercase tracking-wider text-white/60">{language}</span>
+        <button
+          type="button"
+          aria-label="Copy code"
+          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-white/70 transition-opacity duration-150 hover:bg-white/10 hover:text-white focus-visible:opacity-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary) md:opacity-0 md:group-hover:opacity-100"
+          onClick={copyCode}
+        >
+          {copied ? <FontAwesomeIcon className="h-3 w-3 text-emerald-400" icon="check" /> : <FontAwesomeIcon className="h-3 w-3" icon="copy" />}
+        </button>
+      </div>
+      <SyntaxHighlighter
+        language={language}
+        style={tomorrowNight}
+        showLineNumbers
+        wrapLongLines
+        customStyle={{
+          margin: 0,
+          background: 'var(--codeblock-bg)',
+          padding: '0.75rem 0',
+          fontSize: '0.875rem',
+          lineHeight: '1.5rem',
+        }}
+        lineNumberStyle={{ color: 'rgba(255, 255, 255, 0.25)', minWidth: '2.5em', paddingRight: '1em', userSelect: 'none' }}
+        codeTagProps={{ className: 'code-block-content' }}
+        PreTag="div"
+      >
+        {code}
+      </SyntaxHighlighter>
+    </div>
+  )
+}
 
 const MarkdownPreview: FC<{
   file: OdFolderChildren
@@ -126,7 +170,6 @@ const MarkdownPreview: FC<{
       className,
       children,
       node,
-      ...props
     }: {
       className?: string | undefined
       children: ReactNode
@@ -137,7 +180,7 @@ const MarkdownPreview: FC<{
 
       if (inline) {
         return (
-          <code className={className} {...props}>
+          <code className={className}>
             {children}
           </code>
         )
@@ -145,18 +188,7 @@ const MarkdownPreview: FC<{
 
       const rawLanguage = (match ? match[1] : 'text').toLowerCase()
       const language = LANGUAGE_ALIASES[rawLanguage] ?? rawLanguage
-      return (
-        <SyntaxHighlighter
-          language={language}
-          style={tomorrowNight}
-          customStyle={CODE_BLOCK_STYLE}
-          codeTagProps={{ className: 'code-block-content' }}
-          PreTag="div"
-          {...props}
-        >
-          {String(children).replace(/\n$/, '')}
-        </SyntaxHighlighter>
-      )
+      return <CodeBlock language={language} code={String(children).replace(/\n$/, '')} />
     },
   }
 
