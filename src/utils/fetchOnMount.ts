@@ -14,12 +14,21 @@ export default function useFileContent(
   const hashedToken = getStoredToken(path)
   const url = fetchUrl + (hashedToken ? `&odpt=${hashedToken}` : '')
 
-  const { data, error, isValidating } = useSWR(url, () =>
-    axios
-      // Using 'blob' as response type to get the response as a raw file blob, which is later parsed as a string.
-      // Axios defaults response parsing to JSON, which causes issues when parsing JSON files.
-      .get(url, { responseType: 'blob' })
-      .then(async res => res.data.text())
+  const { data, error, isValidating } = useSWR(
+    url,
+    () =>
+      axios
+        // Using 'blob' as response type to get the response as a raw file blob, which is later parsed as a string.
+        // Axios defaults response parsing to JSON, which causes issues when parsing JSON files.
+        .get(url, { responseType: 'blob' })
+        .then(async res => res.data.text()),
+    {
+      // Don't refetch the preview when the window regains focus (switching
+      // back from another tab/app used to reload the file every time).
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
   )
 
   return { response: data, error: error?.message ?? '', validating: isValidating ?? true }
