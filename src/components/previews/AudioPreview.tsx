@@ -53,11 +53,11 @@ const AudioPreview: FC<{ file: OdFileObject }> = ({ file }) => {
     <>
       <PreviewContainer>
         <div className="flex flex-col space-y-4 md:flex-row md:space-x-4">
-          <div className="relative flex aspect-square w-full items-center justify-center rounded-sm bg-gray-100 transition-all duration-75 dark:bg-gray-700 md:w-48">
+          <div className="relative flex aspect-square w-full items-center justify-center rounded-xl border border-(--glass-border) bg-(--surface-sunken) transition-all duration-75 md:w-48">
             <div
-              className={`absolute z-20 flex h-full w-full items-center justify-center transition-all duration-300 ${
+              className={`absolute z-20 flex h-full w-full items-center justify-center rounded-xl transition-all duration-300 ${
                 playerStatus === PlayerState.Loading
-                  ? 'bg-white opacity-80 dark:bg-gray-800'
+                  ? 'bg-(--card-bg-transparent) opacity-80'
                   : 'bg-transparent opacity-0'
               }`}
             >
@@ -65,30 +65,24 @@ const AudioPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             </div>
 
             {!brokenThumbnail ? (
-              <div className="absolute m-4 aspect-square rounded-full shadow-lg">
+              <div className="absolute inset-3 overflow-hidden rounded-lg shadow-lg">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  className={`h-full w-full rounded-full object-cover object-top ${
-                    playerStatus === PlayerState.Playing ? 'animate-spin-slow' : ''
-                  }`}
+                  className="h-full w-full object-cover object-top"
                   src={thumbnail}
                   alt={file.name}
                   onError={() => setBrokenThumbnail(true)}
                 />
               </div>
             ) : (
-              <FontAwesomeIcon
-                className={`z-10 h-5 w-5 ${playerStatus === PlayerState.Playing ? 'animate-spin' : ''}`}
-                icon="music"
-                size="2x"
-              />
+              <FontAwesomeIcon className="z-10 h-5 w-5" icon="music" size="2x" />
             )}
           </div>
 
           <div className="flex w-full flex-col justify-between">
             <div>
               <div className="mb-2 font-medium">{file.name}</div>
-              <div className="mb-4 text-sm text-gray-500">
+              <div className="mb-4 text-sm text-(--content-meta)">
                 {'Last modified:' + ' ' + formatModifiedDateTime(file.lastModifiedDateTime)}
               </div>
             </div>

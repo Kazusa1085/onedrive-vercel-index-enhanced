@@ -49,6 +49,9 @@ import {
   faExclamationTriangle,
   faTh,
   faThList,
+  faSun,
+  faMoon,
+  faCircleHalfStroke,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faGithub,
@@ -177,6 +180,9 @@ library.add(
   faTh,
   faThList,
   faPen,
+  faSun,
+  faMoon,
+  faCircleHalfStroke,
   ...brandIcons,
 )
 

@@ -12,12 +12,14 @@ function LinkContainer({ title, value }: { title: string; value: string }) {
   const clipboard = useClipboard({ copiedTimeout: 1000 })
   return (
     <>
-      <h4 className="py-2 text-xs font-medium uppercase tracking-wider">{title}</h4>
-      <div className="group relative mb-2 max-h-24 overflow-y-scroll break-all rounded-sm border border-gray-400/20 bg-gray-50 p-2.5 font-mono dark:bg-gray-800">
-        <div className="opacity-80">{value}</div>
+      <h4 className="py-2 text-xs font-medium uppercase tracking-wider text-(--content-meta)">{title}</h4>
+      <div className="group relative mb-2 max-h-24 overflow-y-auto break-all rounded-lg border border-(--line-divider) bg-(--surface-sunken) p-2.5 pr-11 font-mono">
+        <div className="text-(--content-main)">{value}</div>
         <button
+          type="button"
+          aria-label={`Copy ${title}`}
           onClick={() => clipboard.copy(value)}
-          className="absolute top-[0.2rem] right-[0.2rem] w-8 rounded-sm border border-gray-400/40 bg-gray-100 py-1.5 opacity-0 transition-all duration-100 hover:bg-gray-200 group-hover:opacity-100 dark:bg-gray-850 dark:hover:bg-gray-700"
+          className="btn-plain absolute top-1 right-1 flex h-8 w-8 items-center justify-center rounded-md border border-(--glass-border) bg-(--surface-raised) text-(--content-main) opacity-100 transition-opacity duration-100 hover:bg-(--btn-plain-bg-hover) md:opacity-0 md:group-hover:opacity-100"
         >
           {clipboard.copied ? <FontAwesomeIcon icon="check" /> : <FontAwesomeIcon icon="copy" />}
         </button>
@@ -79,7 +81,7 @@ export default function CustomEmbedLinkMenu({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-white/60 dark:bg-gray-800/60" />
+            <div className="fixed inset-0 bg-(--page-bg) opacity-80 backdrop-blur-sm" />
           </Transition.Child>
 
           {/* This element is to trick the browser into centering the modal contents. */}
@@ -95,18 +97,18 @@ export default function CustomEmbedLinkMenu({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="inline-block max-h-[80vh] w-full max-w-3xl transform overflow-hidden overflow-y-scroll rounded-sm border border-gray-400/30 bg-white p-4 text-left align-middle text-sm shadow-xl transition-all dark:bg-gray-900 dark:text-white">
+            <div className="card-base inline-block max-h-[80vh] w-full max-w-3xl transform overflow-hidden overflow-y-auto p-4 text-left align-middle text-sm text-(--content-main)">
               <Dialog.Title as="h3" className="py-2 text-xl font-bold">
                 {'Customise direct link'}
               </Dialog.Title>
-              <Dialog.Description as="p" className="py-2 opacity-80">
+              <Dialog.Description as="p" className="py-2 text-(--content-meta)">
                 <>
                   {'Change the raw file direct link to a URL ending with the extension of the file.'}{' '}
                   <a
                     href="https://ovi.swo.moe/docs/features/customise-direct-link"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 underline"
+                    className="text-(--primary-text) underline underline-offset-2"
                   >
                     {'What is this?'}
                   </a>
@@ -116,10 +118,11 @@ export default function CustomEmbedLinkMenu({
               <div className="mt-4">
                 <h4 className="py-2 text-xs font-medium uppercase tracking-wider">{'Filename'}</h4>
                 <input
-                  className="mb-2 w-full rounded-sm border border-gray-600/10 p-2.5 font-mono focus:outline-hidden focus:ring-3 focus:ring-blue-300 dark:bg-gray-600 dark:text-white dark:focus:ring-blue-700"
+                  className="mb-2 w-full rounded-lg border border-(--line-divider) bg-(--surface-sunken) p-2.5 font-mono text-(--content-main) focus:outline-hidden"
                   ref={focusInputRef}
                   value={name}
                   onChange={e => setName(e.target.value)}
+                  aria-label="Custom filename"
                 />
 
                 <LinkContainer title={'Default'} value={buildRawUrl(readablePath)} />

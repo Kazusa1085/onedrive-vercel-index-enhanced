@@ -69,15 +69,16 @@ export const ChildName: FC<{ name: string; folder?: boolean }> = ({ name, folder
   const extension = folder ? '' : getRawExtension(original)
   const prename = folder ? original : original.substring(0, original.length - extension.length)
   return (
-    <span className="truncate before:float-right before:content-[attr(data-tail)]" data-tail={extension}>
+    <span className="truncate md:before:float-right md:before:content-[attr(data-tail)]" data-tail={extension}>
       {prename}
+      {extension ? <span className="md:hidden">{extension}</span> : null}
     </span>
   )
 }
 export const ChildIcon: FC<{ child: OdFolderChildren }> = ({ child }) => {
   const { render, emoji } = renderEmoji(child.name)
   return render ? (
-    <span>{emoji ? emoji[0] : '📁'}</span>
+    <span aria-hidden="true">{emoji ? emoji[0] : '📁'}</span>
   ) : (
     <FontAwesomeIcon icon={child.file ? getFileIcon(child.name, { video: Boolean(child.video) }) : ['far', 'folder']} />
   )
@@ -227,7 +228,9 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
         {!onlyOnePage && (
           <div className="card-base mt-3 overflow-hidden text-(--content-main)">
             <div className="border-b border-(--line-divider) p-3 text-center font-mono text-sm text-(--content-meta)">
-              - showing {size} page{size > 1 ? 's' : ''} of {isLoadingMore ? '...' : folderChildren.length} files -
+              {isLoadingMore
+                ? 'Loading more items…'
+                : `Loaded ${folderChildren.length} items · ${size} page${size > 1 ? 's' : ''}`}
             </div>
             <button
               className={`btn-card flex w-full items-center justify-center space-x-2 p-3 rounded-none disabled:cursor-not-allowed ${

@@ -116,9 +116,6 @@ importers:
       react-syntax-highlighter:
         specifier: ^16.1.1
         version: 16.1.1(react@19.2.8)
-      react-use-system-theme:
-        specifier: ^1.1.1
-        version: 1.1.1(react@19.2.8)
       rehype-katex:
         specifier: ^7.0.1
         version: 7.0.1
@@ -3063,11 +3060,6 @@ packages:
   react-syntax-highlighter@16.1.1:
     resolution: {integrity: sha512-PjVawBGy80C6YbC5DDZJeUjBmC7skaoEUdvfFQediQHgCL7aKyVHe57SaJGfQsloGDac+gCpTfRdtxzWWKmCXA==}
     engines: {node: '>= 16.20.2'}
-    peerDependencies:
-      react: '>=19.0.0'
-
-  react-use-system-theme@1.1.1:
-    resolution: {integrity: sha512-Mlohol/QkEIbIKt8lXJP0iVvRAgOMml2iZ+bwvE1KpQFAG5DKJGFjZmEqebdj7WCu24u+34kpMtFDGMb4+5uSA==}
     peerDependencies:
       react: '>=19.0.0'
 
@@ -6697,10 +6689,6 @@ snapshots:
       prismjs: 1.30.0
       react: 19.2.8
       refractor: 5.0.0
-
-  react-use-system-theme@1.1.1(react@19.2.8):
-    dependencies:
-      react: 19.2.8
 
   react@19.2.8: {}
 

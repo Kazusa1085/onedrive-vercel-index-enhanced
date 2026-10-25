@@ -23,6 +23,10 @@ module.exports = {
   // The name of your website. Present alongside your icon.
   title: "Kazusa1085's Onedrive",
 
+  // [OPTIONAL] The single OKLCH hue that drives every accent colour.
+  // 345 = rose (default), 220 = blue, 140 = green, 280 = purple.
+  themeHue: 345,
+
   // The folder that you are to share publicly with onedrive-vercel-index. Use '/' if you want to share your root folder.
   baseDirectory: process.env.BASE_DIRECTORY || '/',
 

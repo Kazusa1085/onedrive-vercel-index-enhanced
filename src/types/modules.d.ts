@@ -1,10 +1,6 @@
 // Minimal ambient declarations for small third-party packages that do not ship
 // TypeScript definitions. Keeping them here avoids weakening the project-wide
 // `noImplicitAny` setting for every other module.
-declare module 'react-use-system-theme' {
-  export default function useSystemTheme(fallback?: string): string
-}
-
 declare module 'react-syntax-highlighter/dist/cjs/light-async' {
   import type { ComponentType } from 'react'
   const SyntaxHighlighter: ComponentType<Record<string, unknown>>

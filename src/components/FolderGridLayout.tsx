@@ -7,6 +7,7 @@ import { useClipboard } from 'use-clipboard-copy'
 
 import { getBaseUrl } from '../utils/getBaseUrl'
 import { formatModifiedDateTime } from '../utils/fileDetails'
+import { getRawExtension } from '../utils/getFileIcon'
 import { ChildIcon, ChildName, Downloading } from './FileListing'
 import { useCardGlare } from '../utils/useCardGlare'
 import { getStoredToken } from '../utils/protectedRouteHandler'
@@ -32,7 +33,7 @@ const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
 
   return (
     <div className="space-y-2">
-      <div className="h-32 overflow-hidden rounded-xl border border-(--line-divider) transition-all duration-200 group-hover:rounded-2xl">
+      <div className="h-32 overflow-hidden rounded-xl border border-(--line-divider) bg-(--surface-sunken) transition-all duration-200 group-hover:rounded-2xl">
         {thumbnailUrl && !brokenThumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -44,10 +45,18 @@ const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
             onError={() => setBrokenThumbnail(true)}
           />
         ) : (
-          <div className="relative flex h-full w-full items-center justify-center rounded-lg">
-            <ChildIcon child={c} />
-            <span className="absolute bottom-0 right-0 m-1 font-medium text-(--content-meta)">
-              {c.folder?.childCount}
+          <div
+            className="relative flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-(--line-divider) bg-(--surface-sunken)"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 35% 20%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 62%)',
+            }}
+          >
+            <span className="text-2xl text-(--primary-text)">
+              <ChildIcon child={c} />
+            </span>
+            <span className="absolute right-2 bottom-2 rounded-md bg-(--card-bg-transparent) px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-wide text-(--content-meta)">
+              {c.folder ? `${c.folder.childCount ?? 0} items` : getRawExtension(c.name) || 'file'}
             </span>
           </div>
         )}
@@ -94,9 +103,9 @@ const FolderGridItem = ({
       className="card-glare-host group onload-animation relative overflow-hidden rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-1 hover:bg-(--btn-plain-bg-hover) hover:shadow-(--card-shadow-hover)"
       style={{ animationDelay: `${Math.min(index, 8) * 50}ms` }}
     >
-      <div className="absolute top-0 right-0 z-10 m-1 rounded-sm bg-white/50 py-0.5 opacity-100 transition-all duration-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 dark:bg-gray-900/50">
+      <div className="absolute top-0 right-0 z-10 m-1 flex items-center gap-0.5 rounded-lg border border-(--glass-border) bg-(--card-bg-transparent) p-0.5 opacity-100 backdrop-blur-md transition-all duration-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
         {c.folder ? (
-          <div>
+          <div className="flex items-center gap-0.5">
             <span
               title="Copy folder permalink"
               aria-label={`Copy link for folder ${c.name}`}
@@ -106,7 +115,7 @@ const FolderGridItem = ({
                 clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
                 toast('Copied folder permalink.', { icon: '👌' })
               })}
-              className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
+              className="btn-plain flex h-10 w-10 cursor-pointer items-center justify-center rounded-md"
               onClick={() => {
                 clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
                 toast('Copied folder permalink.', { icon: '👌' })
@@ -115,7 +124,10 @@ const FolderGridItem = ({
               <FontAwesomeIcon icon={['far', 'copy']} />
             </span>
             {folderGenerating[c.id] ? (
-              <Downloading title={'Downloading folder, refresh page to cancel'} style="px-1.5 py-1" />
+              <Downloading
+                title={'Downloading folder, refresh page to cancel'}
+                style="flex h-10 w-10 items-center justify-center"
+              />
             ) : (
               <span
                 title="Download folder"
@@ -123,7 +135,7 @@ const FolderGridItem = ({
                 role="button"
                 tabIndex={0}
                 onKeyDown={activateOnKeyDown(handleFolderDownload(getItemPath(c.name), c.id, c.name))}
-                className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
+                className="btn-plain flex h-10 w-10 cursor-pointer items-center justify-center rounded-md"
                 onClick={handleFolderDownload(getItemPath(c.name), c.id, c.name)}
               >
                 <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
@@ -131,7 +143,7 @@ const FolderGridItem = ({
             )}
           </div>
         ) : (
-          <div>
+          <div className="flex items-center gap-0.5">
             <span
               title="Copy raw file permalink"
               aria-label={`Copy link for file ${c.name}`}
@@ -141,7 +153,7 @@ const FolderGridItem = ({
                 clipboard.copy(buildRawUrl(getItemPath(c.name)))
                 toast.success('Copied raw file permalink.')
               })}
-              className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
+              className="btn-plain flex h-10 w-10 cursor-pointer items-center justify-center rounded-md"
               onClick={() => {
                 clipboard.copy(buildRawUrl(getItemPath(c.name)))
                 toast.success('Copied raw file permalink.')
@@ -152,7 +164,7 @@ const FolderGridItem = ({
             <a
               title="Download file"
               aria-label={`Download file ${c.name}`}
-              className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
+              className="btn-plain flex h-10 w-10 cursor-pointer items-center justify-center rounded-md"
               href={buildRawUrl(getItemPath(c.name))}
             >
               <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
@@ -161,7 +173,7 @@ const FolderGridItem = ({
         )}
       </div>
 
-      <Link href={getItemPath(c.name)} passHref>
+      <Link href={getItemPath(c.name)} passHref className="relative z-[1] block">
         <GridItem c={c} path={getItemPath(c.name)} />
       </Link>
       <div className="card-glare" />

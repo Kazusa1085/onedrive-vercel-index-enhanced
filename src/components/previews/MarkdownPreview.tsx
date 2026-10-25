@@ -151,13 +151,13 @@ const CodeBlock: FC<{ language: string; code: string }> = ({ language, code }) =
   }
 
   return (
-    <div className="code-block group my-4 overflow-hidden rounded-sm border border-(--line-divider)">
+    <div className="code-block group my-4 overflow-hidden rounded-xl border border-(--line-divider)">
       <div className="flex items-center justify-between bg-(--codeblock-topbar-bg) px-4 py-1.5">
         <span className="font-mono text-xs font-medium uppercase tracking-wider text-white/60">{language}</span>
         <button
           type="button"
           aria-label="Copy code"
-          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-white/70 transition-opacity duration-150 hover:bg-white/10 hover:text-white focus-visible:opacity-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary) md:opacity-0 md:group-hover:opacity-100"
+          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-white/70 transition-opacity duration-150 hover:bg-white/10 hover:text-white focus-visible:opacity-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--focus-ring) md:opacity-0 md:group-hover:opacity-100"
           onClick={copyCode}
         >
           {copied ? (
@@ -167,29 +167,32 @@ const CodeBlock: FC<{ language: string; code: string }> = ({ language, code }) =
           )}
         </button>
       </div>
-      <SyntaxHighlighter
-        language={language}
-        style={tomorrowNight}
-        showLineNumbers
-        wrapLongLines
-        customStyle={{
-          margin: 0,
-          background: 'var(--codeblock-bg)',
-          padding: '0.75rem 0',
-          fontSize: '0.875rem',
-          lineHeight: '1.5rem',
-        }}
-        lineNumberStyle={{
-          color: 'rgba(255, 255, 255, 0.25)',
-          minWidth: '2.5em',
-          paddingRight: '1em',
-          userSelect: 'none',
-        }}
-        codeTagProps={{ className: 'code-block-content' }}
-        PreTag="div"
-      >
-        {code}
-      </SyntaxHighlighter>
+      {/* A scroll container must be keyboard reachable; the linter only sees a plain div. */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={`${language || 'Plain text'} code block`}>
+        <SyntaxHighlighter
+          language={language}
+          style={tomorrowNight}
+          showLineNumbers
+          customStyle={{
+            margin: 0,
+            background: 'var(--codeblock-bg)',
+            padding: '0.75rem 0',
+            fontSize: '0.875rem',
+            lineHeight: '1.5rem',
+          }}
+          lineNumberStyle={{
+            color: 'rgba(255, 255, 255, 0.25)',
+            minWidth: '2.5em',
+            paddingRight: '1em',
+            userSelect: 'none',
+          }}
+          codeTagProps={{ className: 'code-block-content' }}
+          PreTag="div"
+        >
+          {code}
+        </SyntaxHighlighter>
+      </div>
     </div>
   )
 }

@@ -28,6 +28,7 @@ All configuration lives in the `config/` directory. Changes take effect after a 
 | ------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------- |
 | `userPrincipalName`                                     | Site owner account (or env `USER_PRINCIPAL_NAME`)                             | empty                   |
 | `title`                                                 | Site title (shown in the navbar)                                              | —                       |
+| `themeHue`                                              | OKLCH hue for every accent colour (345 rose / 220 blue / 140 green / 280 purple) | `345`             |
 | `icon`                                                  | Site icon (path under `/public`)                                              | `/icons/128.png`        |
 | `baseDirectory`                                         | Shared root directory (or env `BASE_DIRECTORY`)                               | `/`                     |
 | `maxItems`                                              | Items per page (max 200)                                                      | `100`                   |

@@ -33,10 +33,10 @@ const URLPreview = () => {
               const url = getSafeUrl(parseDotUrl(content))
               if (url) window.open(url)
             }}
-            btnColor="blue"
             btnText="Open URL"
             btnIcon="external-link-alt"
             btnTitle={`Open URL ${getSafeUrl(parseDotUrl(content)) || 'Unavailable (non-http URL)'}`}
+            variant="primary"
           />
         </div>
       </DownloadBtnContainer>

@@ -197,28 +197,54 @@ code[class*='language-'] {
 */
 
 :root {
+  color-scheme: light;
+  scrollbar-color: color-mix(in oklab, var(--content-meta) 45%, transparent) transparent;
+  scrollbar-width: thin;
+
   --hue: 345; /* 345=rose, 220=blue, 140=green, 280=purple. Change this one value. */
   --radius-large: 1rem;
+  --content-delay: 150ms;
 
+  /* Accent (follows --hue) and readable accent text (separate contrast target). */
   --primary: oklch(0.7 0.14 var(--hue));
+  --primary-text: oklch(0.52 0.14 var(--hue));
+  --focus-ring: var(--primary-text);
   --page-bg: oklch(0.95 0.01 var(--hue));
   --card-bg-transparent: rgba(255, 255, 255, 0.78);
-  --content-main: rgba(0, 0, 0, 0.85);
-  --content-meta: rgba(0, 0, 0, 0.5);
+  --surface-solid: #fff;
+  --surface-raised: rgba(255, 255, 255, 0.94);
+  --surface-sunken: rgba(0, 0, 0, 0.035);
+  --content-main: rgba(0, 0, 0, 0.87);
+  --content-meta: rgba(0, 0, 0, 0.58);
   --line-divider: rgba(0, 0, 0, 0.08);
-  --title-active: oklch(0.6 0.1 var(--hue));
+  --title-active: oklch(0.55 0.12 var(--hue));
 
-  --btn-regular-bg: oklch(0.72 0.14 var(--hue));
-  --btn-regular-bg-hover: oklch(0.67 0.14 var(--hue));
-  --btn-regular-bg-active: oklch(0.62 0.14 var(--hue));
+  --btn-regular-bg: oklch(0.58 0.14 var(--hue));
+  --btn-regular-bg-hover: oklch(0.54 0.14 var(--hue));
+  --btn-regular-bg-active: oklch(0.5 0.14 var(--hue));
+  --btn-regular-content: #fff;
   --btn-plain-bg-hover: rgba(0, 0, 0, 0.06);
   --btn-plain-bg-active: rgba(0, 0, 0, 0.1);
   --btn-card-bg-hover: rgba(255, 255, 255, 0.65);
   --btn-card-bg-active: rgba(255, 255, 255, 0.45);
+  --btn-danger-bg: oklch(0.52 0.16 25);
+  --btn-danger-bg-hover: oklch(0.47 0.16 25);
 
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --card-shadow: 0 6px 24px rgba(30, 10, 20, 0.08);
-  --card-shadow-hover: 0 14px 38px rgba(30, 10, 20, 0.16);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --card-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  --card-shadow-hover: 0 14px 38px rgba(0, 0, 0, 0.14);
+  --glare-color: color-mix(in oklab, var(--primary) 18%, transparent);
+
+  /* Semantic colors (meaning, not brand hue). */
+  --warning-text: oklch(0.45 0.12 85);
+  --warning-bg: color-mix(in oklab, var(--warning-text) 10%, transparent);
+  --warning-border: color-mix(in oklab, var(--warning-text) 32%, transparent);
+  --danger-text: oklch(0.48 0.16 25);
+  --danger-bg: color-mix(in oklab, var(--danger-text) 10%, transparent);
+  --danger-border: color-mix(in oklab, var(--danger-text) 32%, transparent);
+  --success-text: oklch(0.43 0.12 155);
+  --success-bg: color-mix(in oklab, var(--success-text) 10%, transparent);
+  --success-border: color-mix(in oklab, var(--success-text) 32%, transparent);
 
   /* Code block, adapted from the Kazusa blog's expressive-code theme */
   --codeblock-bg: oklch(0.17 0.015 var(--hue));
@@ -226,37 +252,57 @@ code[class*='language-'] {
   --codeblock-selection: oklch(0.4 0.08 var(--hue));
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --primary: oklch(0.75 0.14 var(--hue));
-    --page-bg: oklch(0.16 0.014 var(--hue));
-    --card-bg-transparent: rgba(23, 23, 23, 0.78);
-    --content-main: rgba(255, 255, 255, 0.85);
-    --content-meta: rgba(255, 255, 255, 0.45);
-    --line-divider: rgba(255, 255, 255, 0.08);
-    --title-active: oklch(0.8 0.1 var(--hue));
+:root[data-theme='dark'] {
+  color-scheme: dark;
 
-    --btn-regular-bg: oklch(0.62 0.13 var(--hue));
-    --btn-regular-bg-hover: oklch(0.67 0.13 var(--hue));
-    --btn-regular-bg-active: oklch(0.72 0.13 var(--hue));
-    --btn-plain-bg-hover: rgba(255, 255, 255, 0.08);
-    --btn-plain-bg-active: rgba(255, 255, 255, 0.12);
-    --btn-card-bg-hover: rgba(255, 255, 255, 0.06);
-    --btn-card-bg-active: rgba(255, 255, 255, 0.1);
+  --primary: oklch(0.75 0.14 var(--hue));
+  --primary-text: oklch(0.82 0.12 var(--hue));
+  --focus-ring: var(--primary-text);
+  --page-bg: oklch(0.16 0.014 var(--hue));
+  --card-bg-transparent: rgba(23, 23, 23, 0.78);
+  --surface-solid: oklch(0.2 0.015 var(--hue));
+  --surface-raised: oklch(0.24 0.015 var(--hue));
+  --surface-sunken: rgba(255, 255, 255, 0.04);
+  --content-main: rgba(255, 255, 255, 0.87);
+  --content-meta: rgba(255, 255, 255, 0.55);
+  --line-divider: rgba(255, 255, 255, 0.1);
+  --title-active: oklch(0.82 0.1 var(--hue));
 
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --card-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
-    --card-shadow-hover: 0 14px 38px rgba(0, 0, 0, 0.5);
+  --btn-regular-bg: oklch(0.58 0.13 var(--hue));
+  --btn-regular-bg-hover: oklch(0.54 0.13 var(--hue));
+  --btn-regular-bg-active: oklch(0.5 0.13 var(--hue));
+  --btn-regular-content: #fff;
+  --btn-plain-bg-hover: rgba(255, 255, 255, 0.08);
+  --btn-plain-bg-active: rgba(255, 255, 255, 0.12);
+  --btn-card-bg-hover: rgba(255, 255, 255, 0.06);
+  --btn-card-bg-active: rgba(255, 255, 255, 0.1);
+  --btn-danger-bg: oklch(0.48 0.16 25);
+  --btn-danger-bg-hover: oklch(0.43 0.16 25);
 
-    --codeblock-bg: oklch(0.17 0.015 var(--hue));
-    --codeblock-topbar-bg: oklch(0.12 0.015 var(--hue));
-  }
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --card-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --card-shadow-hover: 0 14px 38px rgba(0, 0, 0, 0.5);
+  --glare-color: color-mix(in oklab, var(--primary) 14%, transparent);
+
+  --warning-text: oklch(0.82 0.12 85);
+  --danger-text: oklch(0.8 0.13 25);
+  --success-text: oklch(0.8 0.12 155);
+
+  --codeblock-bg: oklch(0.17 0.015 var(--hue));
+  --codeblock-topbar-bg: oklch(0.12 0.015 var(--hue));
 }
 
 @layer base {
   body {
     background-color: var(--page-bg);
     color: var(--content-main);
+  }
+
+  /* Visible keyboard focus everywhere, including elements that opt out of the
+     browser default outline for styling reasons. */
+  :where(a, button, input, textarea, select, summary, [role='button'], [tabindex]):focus-visible {
+    outline: 2px solid var(--focus-ring) !important;
+    outline-offset: 2px !important;
   }
 }
 
@@ -296,6 +342,38 @@ code[class*='language-'] {
     justify-content: center;
     gap: 0.5rem;
     background-color: var(--btn-regular-bg);
+    color: var(--btn-regular-content);
+    border: none;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 4px 12px oklch(0 0 0 / 0.18);
+    transition:
+      background-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+  .btn-regular:hover:not(:disabled) {
+    background-color: var(--btn-regular-bg-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px oklch(0 0 0 / 0.22);
+  }
+  .btn-regular:active:not(:disabled) {
+    background-color: var(--btn-regular-bg-active);
+    transform: scale(0.97);
+  }
+  .btn-regular:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    box-shadow: none;
+  }
+
+  .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--btn-danger-bg);
     color: #fff;
     border: none;
     cursor: pointer;
@@ -307,14 +385,17 @@ code[class*='language-'] {
       box-shadow 0.2s ease,
       transform 0.2s ease;
   }
-  .btn-regular:hover {
-    background-color: var(--btn-regular-bg-hover);
+  .btn-danger:hover:not(:disabled) {
+    background-color: var(--btn-danger-bg-hover);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px oklch(0 0 0 / 0.22);
   }
-  .btn-regular:active {
-    background-color: var(--btn-regular-bg-active);
+  .btn-danger:active:not(:disabled) {
     transform: scale(0.97);
+  }
+  .btn-danger:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    box-shadow: none;
   }
 
   .btn-card {
@@ -349,12 +430,9 @@ code[class*='language-'] {
   .card-glare {
     position: absolute;
     inset: 0;
+    z-index: 0;
     border-radius: inherit;
-    background: radial-gradient(
-      260px circle at var(--gx, 50%) var(--gy, 50%),
-      rgba(255, 255, 255, 0.28),
-      transparent 65%
-    );
+    background: radial-gradient(260px circle at var(--gx, 50%) var(--gy, 50%), var(--glare-color), transparent 65%);
     opacity: 0;
     transition: opacity 0.2s ease;
     pointer-events: none;
@@ -401,10 +479,8 @@ code[class*='language-'] {
     opacity: 0.4;
     animation: drift 26s ease-in-out infinite;
   }
-  @media (prefers-color-scheme: dark) {
-    .blob {
-      opacity: 0.42;
-    }
+  :root[data-theme='dark'] .blob {
+    opacity: 0.42;
   }
   .b1 {
     background: oklch(0.66 0.14 var(--hue));
@@ -494,4 +570,62 @@ code[class*='language-'] {
 /* Spoiler content stays hidden until clicked (the wrapper span toggles state) */
 .markdown-body .spoiler {
   user-select: none;
+}
+
+/* site.config.footer is raw HTML; keep its links inside the design system. */
+.footer a {
+  color: var(--primary-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.footer a:hover {
+  color: var(--title-active);
+}
+
+/* Code blocks keep a dark surface in both themes, so their focus ring must
+   stay light even when the page is in light mode. */
+.code-block button:focus-visible {
+  outline-color: oklch(0.85 0.1 var(--hue)) !important;
+}
+
+.code-block .code-block-content {
+  white-space: pre;
+}
+
+/* Motion preferences: keep the interface static and readable. */
+@media (prefers-reduced-motion: reduce) {
+  .onload-animation {
+    opacity: 1;
+    animation: none;
+  }
+
+  .card-glare {
+    display: none;
+  }
+
+  .card-glare-host:hover {
+    transform: none !important;
+  }
+
+  .btn-plain,
+  .btn-regular,
+  .btn-danger,
+  .btn-card {
+    transition: none;
+  }
+
+  .btn-plain:active,
+  .btn-regular:active,
+  .btn-danger:active,
+  .btn-card:active {
+    transform: none;
+  }
+}
+
+/* Mobile GPUs: keep the aurora atmosphere but spend less on blur. */
+@media (max-width: 640px) {
+  .blob {
+    filter: blur(64px);
+    opacity: 0.32;
+  }
 }

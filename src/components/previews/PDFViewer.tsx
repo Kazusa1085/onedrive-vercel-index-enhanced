@@ -156,7 +156,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, fileSize }) => {
       </div>
       <div
         ref={containerRef}
-        className="flex w-full flex-1 flex-col items-center overflow-y-auto bg-gray-100 p-2 dark:bg-gray-900"
+        className="flex w-full flex-1 flex-col items-center overflow-y-auto bg-(--surface-sunken) p-2"
       />
     </div>
   )

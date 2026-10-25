@@ -159,25 +159,19 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         <div className="flex flex-wrap justify-center gap-2">
           <DownloadButton
             onClickCallback={() => window.open(videoUrl)}
-            btnColor="blue"
             btnText="Download"
             btnIcon="file-download"
+            variant="primary"
           />
           <DownloadButton
             onClickCallback={() => {
               clipboard.copy(buildRawUrl(asPath))
               toast.success('Copied direct link to clipboard.')
             }}
-            btnColor="pink"
             btnText="Copy direct link"
             btnIcon="copy"
           />
-          <DownloadButton
-            onClickCallback={() => setMenuOpen(true)}
-            btnColor="teal"
-            btnText={'Customise link'}
-            btnIcon="pen"
-          />
+          <DownloadButton onClickCallback={() => setMenuOpen(true)} btnText={'Customise link'} btnIcon="pen" />
 
           <DownloadButton
             onClickCallback={() => window.open(`iina://weblink?url=${encodeURIComponent(videoUrl)}`)}

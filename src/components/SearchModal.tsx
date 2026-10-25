@@ -102,7 +102,7 @@ function SearchResultItemTemplate({
     <Link
       href={driveItemPath}
       passHref
-      className={`flex items-center space-x-4 border-b border-gray-400/30 px-4 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-850 ${
+      className={`flex items-center space-x-4 border-b border-(--line-divider) px-4 py-1.5 hover:bg-(--btn-plain-bg-hover) ${
         disabled ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'
       }`}
     >
@@ -110,7 +110,7 @@ function SearchResultItemTemplate({
       <div>
         <div className="text-sm font-medium leading-8">{driveItem.name}</div>
         <div
-          className={`overflow-hidden truncate font-mono text-xs opacity-60 ${
+          className={`overflow-hidden truncate font-mono text-xs text-(--content-meta) ${
             itemDescription === 'Loading ...' && 'animate-pulse'
           }`}
         >
@@ -200,7 +200,7 @@ export default function SearchModal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-white/80 dark:bg-gray-800/80" aria-hidden="true" />
+          <div className="fixed inset-0 bg-(--page-bg) opacity-80 backdrop-blur-sm" aria-hidden="true" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -214,9 +214,9 @@ export default function SearchModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-95 scale-95"
             >
-              <Dialog.Panel className="relative w-full max-w-3xl transform overflow-hidden rounded-sm border border-gray-400/30 bg-white text-left shadow-xl dark:bg-gray-900 dark:text-white">
+              <Dialog.Panel className="card-base relative w-full max-w-3xl transform overflow-hidden text-left text-(--content-main)">
                 <Dialog.Title className="sr-only">Search files</Dialog.Title>
-                <div className="flex items-center space-x-4 border-b border-gray-400/30 bg-gray-50 p-4 dark:bg-gray-800">
+                <div className="flex items-center space-x-4 border-b border-(--line-divider) bg-(--surface-sunken) p-4">
                   <FontAwesomeIcon icon="search" className="h-4 w-4" />
                   <label className="sr-only" htmlFor="search-box">
                     Search files
@@ -225,28 +225,32 @@ export default function SearchModal({
                     type="text"
                     id="search-box"
                     ref={inputRef}
-                    className="w-full bg-transparent focus:outline-hidden focus-visible:outline-hidden"
+                    className="w-full bg-transparent focus:outline-hidden"
                     placeholder="Search ..."
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                   />
-                  <div className="rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium dark:bg-gray-700">ESC</div>
+                  <div className="rounded-md bg-(--btn-plain-bg-hover) px-2 py-1 text-xs font-medium">ESC</div>
                 </div>
                 {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- result area click closes the search; Escape also works */}
                 <div className="max-h-[80vh] overflow-x-hidden overflow-y-scroll" onClick={closeSearchBox}>
                   {results.loading && (
-                    <div className="px-4 py-12 text-center text-sm font-medium">
+                    <div className="px-4 py-12 text-center text-sm font-medium text-(--content-meta)">
                       <LoadingIcon className="svg-inline--fa mr-2 inline-block h-4 w-4 animate-spin" />
                       <span>Loading ...</span>
                     </div>
                   )}
                   {results.error && (
-                    <div className="text-center px-4 py-12 text-sm font-medium">Error: {results.error.message}</div>
+                    <div className="px-4 py-12 text-center text-sm font-medium text-(--danger-text)">
+                      Error: {results.error.message}
+                    </div>
                   )}
                   {results.result && (
                     <>
                       {results.result.length === 0 ? (
-                        <div className="px-4 py-12 text-center text-sm font-medium">{'Nothing here.'}</div>
+                        <div className="px-4 py-12 text-center text-sm font-medium text-(--content-meta)">
+                          {'Nothing here.'}
+                        </div>
                       ) : (
                         results.result.map(result => <SearchResultItem key={result.id} result={result} />)
                       )}

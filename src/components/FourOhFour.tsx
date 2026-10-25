@@ -33,7 +33,7 @@ const FourOhFour: React.FC<{
           <span>
             Need help? Check the{' '}
             <a
-              className="text-(--primary) hover:underline"
+              className="text-(--primary-text) underline-offset-2 hover:underline"
               href="https://github.com/Kazusa1085/onedrive-vercel-index-enhanced/issues"
               target="_blank"
               rel="noopener noreferrer"

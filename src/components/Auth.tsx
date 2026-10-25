@@ -42,7 +42,7 @@ const Auth: FC<{ redirect: string }> = ({ redirect }) => {
 
       <div className="flex items-center space-x-2">
         <input
-          className="flex-1 rounded-lg border border-(--line-divider) bg-(--card-bg-transparent) p-2 font-mono text-(--content-main) backdrop-blur-md focus:outline-hidden focus:ring-3 focus:ring-(--primary)"
+          className="flex-1 rounded-lg border border-(--line-divider) bg-(--card-bg-transparent) p-2 font-mono text-(--content-main) backdrop-blur-md focus:outline-hidden focus:ring-3 focus:ring-(--focus-ring)"
           autoFocus
           type="password"
           placeholder="************"
@@ -61,7 +61,7 @@ const Auth: FC<{ redirect: string }> = ({ redirect }) => {
           }}
         />
         <button
-          className="btn-regular rounded-lg px-4 py-2 focus:outline-hidden focus:ring-3 focus:ring-(--primary)"
+          className="btn-regular rounded-lg px-4 py-2 focus:outline-hidden focus:ring-3 focus:ring-(--focus-ring)"
           title="Unlock folder"
           aria-label="Unlock folder"
           onClick={submit}
@@ -69,7 +69,7 @@ const Auth: FC<{ redirect: string }> = ({ redirect }) => {
           <FontAwesomeIcon icon="arrow-right" />
         </button>
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-(--danger-text)">{error}</p>}
     </div>
   )
 }

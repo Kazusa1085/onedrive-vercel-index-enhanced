@@ -38,7 +38,7 @@
 
 ... 以及更多：
 
-- 深色模式、站点样式自定义、直接分享原始文件链接
+- 跟随系统 / 亮色 / 暗色三态主题切换；单一 OKLCH hue 驱动全站强调色；直接分享原始文件链接
 - Markdown 渲染说明：[docs/markdown.md](docs/markdown.md)
 - 完整配置说明：[docs/configuration.md](docs/configuration.md)
 

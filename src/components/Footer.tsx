@@ -11,7 +11,7 @@ const Footer = () => {
     <div className="w-full pt-6 pb-4">
       <div className="mx-auto w-full max-w-5xl px-4">
         <div
-          className="w-full rounded-2xl border border-(--line-divider) bg-(--card-bg-transparent) p-4 text-center text-xs font-medium text-(--content-meta) shadow-(--card-shadow-hover) backdrop-blur-md"
+          className="footer w-full rounded-2xl border border-(--glass-border) bg-(--card-bg-transparent) p-4 text-center text-xs font-medium text-(--content-meta) shadow-(--card-shadow) backdrop-blur-md"
           dangerouslySetInnerHTML={createFooterMarkup()}
         ></div>
       </div>

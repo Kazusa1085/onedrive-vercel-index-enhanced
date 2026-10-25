@@ -1,4 +1,4 @@
-﻿.markdown-body {
+.markdown-body {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   line-height: 1.5;
@@ -932,7 +932,8 @@
   vertical-align: middle;
 }
 
-@media (prefers-color-scheme: dark) {
+/* Manual theme toggle: the pre-hydration script sets data-theme on <html>. */
+:root[data-theme='dark'] {
   .markdown-body {
     /* color: #c9d1d9; */
     /* background-color: #0d1117; */

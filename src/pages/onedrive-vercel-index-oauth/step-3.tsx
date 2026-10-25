@@ -119,8 +119,8 @@ export default function OAuthStep3({ success, error, description, errorUri }: OA
         <Navbar />
 
         <div className="mx-auto w-full max-w-5xl p-4">
-          <div className="card-base p-3 text-(--content-main)">
-            <div className="mx-auto w-52">
+          <div className="card-base p-4 text-(--content-main) sm:p-5">
+            <div className="mx-auto w-36 sm:w-44">
               <Image
                 src="/images/fabulous-celebration.png"
                 width={912}
@@ -129,26 +129,40 @@ export default function OAuthStep3({ success, error, description, errorUri }: OA
                 priority
               />
             </div>
-            <h3 className="mb-4 text-center text-xl font-medium">Welcome to your new onedrive-vercel-index 🎉</h3>
 
-            <h3 className="mt-4 mb-2 text-lg font-medium">Step 3/3: Get access and refresh tokens</h3>
+            <div className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-(--content-meta)">
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-(--btn-regular-bg) text-[11px] text-(--btn-regular-content)">
+                3
+              </span>
+              <span>{error ? 'Connection failed' : 'Finishing up'}</span>
+              <span className="h-px flex-1 bg-(--line-divider)" />
+              <span>Step 3 / 3</span>
+            </div>
+
+            <h1 className="text-lg font-semibold sm:text-xl">
+              {error ? 'Could not finish authorisation' : 'Your index is ready'}
+            </h1>
+
             {error ? (
-              <div>
-                <p className="py-1 font-medium text-red-500">
+              <div className="mt-4">
+                <p
+                  role="alert"
+                  className="rounded-lg border border-(--danger-border) bg-(--danger-bg) p-2.5 font-medium text-(--danger-text)"
+                >
                   <FontAwesomeIcon icon="exclamation-circle" className="mr-2" />
                   <span>Whoops, looks like we got a problem: {error}.</span>
                 </p>
-                <p className="my-2 whitespace-pre-line rounded-sm border border-(--line-divider) bg-(--btn-plain-bg-hover) p-2 font-mono text-sm opacity-80">
+                <p className="my-2 whitespace-pre-line rounded-lg border border-(--line-divider) bg-(--surface-sunken) p-2.5 font-mono text-sm text-(--content-meta)">
                   {description}
                 </p>
                 {errorUri && (
-                  <p>
+                  <p className="text-sm text-(--content-meta)">
                     Check out{' '}
                     <a
                       href={errorUri}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-(--primary) hover:underline"
+                      className="text-(--primary-text) underline underline-offset-2"
                     >
                       {/* eslint-disable-next-line react/no-unescaped-entities */}
                       Microsoft's official explanation
@@ -156,9 +170,10 @@ export default function OAuthStep3({ success, error, description, errorUri }: OA
                     on the error message.
                   </p>
                 )}
-                <div className="mb-2 mt-6 text-right">
+                <div className="mt-5 flex justify-end">
                   <button
-                    className="rounded-lg bg-red-500 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-red-400 focus:ring-4 focus:ring-red-200 disabled:cursor-not-allowed disabled:grayscale dark:focus:ring-red-800"
+                    type="button"
+                    className="btn-danger"
                     onClick={() => {
                       router.push('/onedrive-vercel-index-oauth/step-1')
                     }}
@@ -168,12 +183,12 @@ export default function OAuthStep3({ success, error, description, errorUri }: OA
                 </div>
               </div>
             ) : (
-              <div>
-                <p className="py-1 font-medium text-teal-500">
-                  <FontAwesomeIcon icon="exclamation-circle" className="mr-2" />
+              <div className="mt-4">
+                <p className="rounded-lg border border-(--success-border) bg-(--success-bg) p-2.5 font-medium text-(--success-text)">
+                  <FontAwesomeIcon icon="check" className="mr-2" />
                   Tokens have been verified and stored securely on the server.
                 </p>
-                <p className="py-1">Going home...</p>
+                <p className="mt-2 text-sm text-(--content-meta)">Going home...</p>
               </div>
             )}
           </div>
