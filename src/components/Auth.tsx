@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 
-import { matchProtectedRoute } from '../utils/protectedRouteHandler'
+import { hashToken, matchProtectedRoute, type StoredHashedToken } from '../utils/protectedRouteHandler'
 import useLocalStorage from '../utils/useLocalStorage'
 
 const Auth: FC<{ redirect: string }> = ({ redirect }) => {
@@ -12,7 +12,21 @@ const Auth: FC<{ redirect: string }> = ({ redirect }) => {
 
   const router = useRouter()
   const [token, setToken] = useState('')
-  const [, setPersistedToken] = useLocalStorage(authTokenPath, '')
+  const [error, setError] = useState('')
+  const [, setPersistedToken] = useLocalStorage<StoredHashedToken | null>(authTokenPath, null)
+
+  const submit = () => {
+    // The server trims .password before hashing, so mirror that behaviour and
+    // never store the plaintext password in localStorage.
+    const password = token.trim()
+    if (!password) {
+      setError('Please enter a password.')
+      return
+    }
+    setError('')
+    setPersistedToken({ v: 2, hash: hashToken(password) })
+    router.reload()
+  }
 
   return (
     <div className="mx-auto flex max-w-sm flex-col space-y-4 md:my-10">
@@ -32,27 +46,30 @@ const Auth: FC<{ redirect: string }> = ({ redirect }) => {
           autoFocus
           type="password"
           placeholder="************"
+          aria-label="Folder password"
+          aria-invalid={error ? 'true' : undefined}
           value={token}
           onChange={e => {
             setToken(e.target.value)
+            if (error) setError('')
           }}
           onKeyDown={e => {
             if (e.key === 'Enter' || e.key === 'NumpadEnter') {
-              setPersistedToken(token)
-              router.reload()
+              e.preventDefault()
+              submit()
             }
           }}
         />
         <button
           className="btn-regular rounded-lg px-4 py-2 focus:outline-hidden focus:ring-3 focus:ring-(--primary)"
-          onClick={() => {
-            setPersistedToken(token)
-            router.reload()
-          }}
+          title="Unlock folder"
+          aria-label="Unlock folder"
+          onClick={submit}
         >
           <FontAwesomeIcon icon="arrow-right" />
         </button>
       </div>
+      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   )
 }

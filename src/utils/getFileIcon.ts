@@ -14,15 +14,19 @@ const icons: { [key: string]: [IconPrefix, IconName] } = {
   file: ['far', 'file'],
   markdown: ['fab', 'markdown'],
   book: ['fas', 'book'],
-  link: ['fas', 'link']
+  link: ['fas', 'link'],
 }
 
-const extensions = {
+const extensions: Record<string, [IconPrefix, IconName]> = {
+  avif: icons.image,
+  bmp: icons.image,
   gif: icons.image,
+  ico: icons.image,
   jpeg: icons.image,
   jpg: icons.image,
   png: icons.image,
   heic: icons.image,
+  svg: icons.image,
   webp: icons.image,
 
   pdf: icons.pdf,
@@ -74,7 +78,7 @@ const extensions = {
   py: icons.code,
   css: icons.code,
   html: icons.code,
-  ts: icons.code,   // typescript or video file, determined below
+  ts: icons.code, // typescript or video file, determined below
   tsx: icons.code,
   rs: icons.code,
   vue: icons.code,
@@ -98,7 +102,7 @@ const extensions = {
   mobi: icons.book,
   azw3: icons.book,
 
-  url: icons.link
+  url: icons.link,
 }
 
 /**

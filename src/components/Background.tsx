@@ -12,13 +12,24 @@ import siteConfig from '../../config/site.config'
  * is rendered instead (under a page-tinted overlay for readability).
  */
 const Background = () => {
-  const [image] = useState(() => {
-    const fixed = siteConfig.backgroundImage
-    if (fixed) return fixed
-    const pool = siteConfig.randomBackgrounds ?? []
-    if (pool.length === 0) return ''
-    return pool[Math.floor(Math.random() * pool.length)]
-  })
+  const fixedImage = siteConfig.backgroundImage
+  // Start with the deterministic value on both server and client so React
+  // hydration never sees two different random picks. The random pool is only
+  // consulted after mount, when it cannot cause a hydration mismatch.
+  const [image, setImage] = useState(fixedImage)
+
+  useEffect(() => {
+    let nextImage = fixedImage
+    if (!nextImage) {
+      const pool = siteConfig.randomBackgrounds ?? []
+      if (pool.length === 0) return
+      nextImage = pool[Math.floor(Math.random() * pool.length)]
+    }
+    // The random pool must be sampled after hydration, so this is a deliberate
+    // external-store read rather than derived state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setImage(nextImage)
+  }, [fixedImage])
 
   const blobShells = useRef<Array<HTMLDivElement | null>>([])
 

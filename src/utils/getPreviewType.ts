@@ -13,11 +13,15 @@ export const preview = {
   url: 'url',
 }
 
-export const extensions = {
+export const extensions: Record<string, string> = {
+  avif: preview.image,
+  bmp: preview.image,
   gif: preview.image,
+  ico: preview.image,
   jpeg: preview.image,
   jpg: preview.image,
   png: preview.image,
+  svg: preview.image,
   webp: preview.image,
 
   md: preview.markdown,
@@ -36,7 +40,7 @@ export const extensions = {
   c: preview.code,
   cpp: preview.code,
   h: preview.code,
-  hpp:preview.code,
+  hpp: preview.code,
   js: preview.code,
   jsx: preview.code,
   java: preview.code,

@@ -9,10 +9,11 @@ import { getStoredToken } from './protectedRouteHandler'
  */
 export default function useFileContent(
   fetchUrl: string,
-  path: string
+  path: string,
 ): { response: string; error: string; validating: boolean } {
   const hashedToken = getStoredToken(path)
-  const url = fetchUrl + (hashedToken ? `&odpt=${hashedToken}` : '')
+  const separator = fetchUrl.includes('?') ? '&' : '?'
+  const url = fetchUrl + (hashedToken ? `${separator}odpt=${encodeURIComponent(hashedToken)}` : '')
 
   const { data, error, isValidating } = useSWR(
     url,
@@ -28,8 +29,8 @@ export default function useFileContent(
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
-    }
+    },
   )
 
-  return { response: data, error: error?.message ?? '', validating: isValidating ?? true }
+  return { response: data ?? '', error: error?.message ?? '', validating: isValidating ?? true }
 }

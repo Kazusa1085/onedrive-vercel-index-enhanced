@@ -93,6 +93,7 @@ import {
 
 import type { AppProps } from 'next/app'
 import NextNProgress from 'nextjs-progressbar'
+import { Toaster } from 'react-hot-toast'
 import Background from '../components/Background'
 
 // Brand icons are imported explicitly: the social links in siteConfig can use
@@ -176,7 +177,7 @@ library.add(
   faTh,
   faThList,
   faPen,
-  ...brandIcons
+  ...brandIcons,
 )
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -184,6 +185,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Background />
       <NextNProgress height={1} color="rgb(156, 163, 175, 0.9)" options={{ showSpinner: false }} />
+      <Toaster />
       <Component {...pageProps} />
     </>
   )

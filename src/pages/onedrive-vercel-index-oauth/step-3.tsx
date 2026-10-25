@@ -1,3 +1,4 @@
+import type { GetServerSidePropsContext } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -8,13 +9,15 @@ import siteConfig from '../../../config/site.config'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 
-
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps({ query }: GetServerSidePropsContext) {
   const { authCode } = query
   const userPrincipalName = siteConfig.userPrincipalName
 
   // dynamic imports keep server-only deps like ioredis out of the client bundle
-  const [{ getAccessToken }, { storeOdAuthTokens }] = await Promise.all([import('../api'), import('../../utils/odAuthTokenStore')])
+  const [{ getAccessToken }, { storeOdAuthTokens }] = await Promise.all([
+    import('../../utils/onedriveApi'),
+    import('../../utils/odAuthTokenStore'),
+  ])
 
   // Check if OAuth authentication has been completed
   const existingAccessToken = await getAccessToken()
@@ -28,7 +31,7 @@ export async function getServerSideProps({ query }) {
     }
   }
 
-  if (!authCode) {
+  if (typeof authCode !== 'string' || authCode.length === 0) {
     return {
       props: {
         error: 'No auth code present',
@@ -88,7 +91,14 @@ export async function getServerSideProps({ query }) {
   }
 }
 
-export default function OAuthStep3({ success, error, description, errorUri }) {
+interface OAuthStep3Props {
+  success?: boolean
+  error?: string
+  description?: string
+  errorUri?: string
+}
+
+export default function OAuthStep3({ success, error, description, errorUri }: OAuthStep3Props) {
   const router = useRouter()
 
   useEffect(() => {

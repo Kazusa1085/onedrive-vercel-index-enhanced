@@ -118,7 +118,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, fileSize }) => {
           >
             重试
           </button>
-          <a href={url} target="_blank" rel="noopener noreferrer" className="btn-plain border border-(--line-divider) px-3 py-1.5">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-plain border border-(--line-divider) px-3 py-1.5"
+          >
             在新标签页打开
           </a>
         </div>

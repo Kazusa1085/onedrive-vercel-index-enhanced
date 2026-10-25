@@ -1,77 +1,98 @@
-import axios from 'axios'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import axios from 'axios'
 
-import { encodePath, getAccessToken } from '.'
 import apiConfig from '../../../config/api.config'
 import siteConfig from '../../../config/site.config'
-import { isProtectedGraphPath } from '../../utils/protectedRouteHandler'
+import { isProtectedGraphItem } from '../../utils/protectedRouteHandler'
+import { encodePath, getAccessToken, queryString, setNoStore, setPublicCache } from '../../utils/onedriveApi'
 import type { OdSearchResult } from '../../types'
 
+const MAX_QUERY_LENGTH = 256
+
+function graphOrigin(): string {
+  try {
+    return new URL(apiConfig.driveApi).origin
+  } catch {
+    return 'https://graph.microsoft.com'
+  }
+}
+
 /**
- * Sanitize the search query
+ * Sanitize the search query.
  *
- * @param query User search query, which may contain special characters
- * @returns Sanitised query string, which:
- * - encodes the '<' and '>' characters,
- * - replaces '?' and '/' characters with ' ',
- * - replaces ''' with ''''
- * Reference: https://stackoverflow.com/questions/41491222/single-quote-escaping-in-microsoft-graph.
+ * Graph's search syntax uses an OData string literal in the path. Escape single
+ * quotes, remove characters that are not valid in this context, then encode the
+ * result as one URL path segment.
  */
 function sanitiseQuery(query: string): string {
-  const sanitisedQuery = query
-    .replace(/'/g, "''")
-    .replace(/</g, ' &lt; ')
-    .replace(/>/g, ' &gt; ')
-    .replace(/\?/g, ' ')
-    .replace(/\//g, ' ')
-    .replace(/\\/g, ' ')
-  return encodeURIComponent(sanitisedQuery)
+  return encodeURIComponent(
+    query
+      .replace(/'/g, "''")
+      .replace(/</g, ' &lt; ')
+      .replace(/>/g, ' &gt; ')
+      .replace(/\?/g, ' ')
+      .replace(/\//g, ' ')
+      .replace(/\\/g, ' '),
+  )
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Get access token from storage
+  if (req.method !== 'GET') {
+    res.setHeader('Allow', 'GET')
+    res.status(405).end()
+    return
+  }
+
+  setNoStore(res)
+
+  const searchQuery = queryString(req.query.q).trim()
+  if (searchQuery.length > MAX_QUERY_LENGTH) {
+    res.status(400).json({ error: 'Search query is too long.' })
+    return
+  }
+  if (searchQuery.length === 0) {
+    setPublicCache(res)
+    res.status(200).json([])
+    return
+  }
+
   const accessToken = await getAccessToken()
-
-  // Query parameter from request
-  const { q: searchQuery = '' } = req.query
-
-  // Set edge function caching for faster load times, check docs:
-  // https://vercel.com/docs/concepts/functions/edge-caching
-  res.setHeader('Cache-Control', apiConfig.cacheControlHeader)
-
-  // Return error 403 if access_token is empty
   if (!accessToken) {
     res.status(403).json({ error: 'No access token.' })
     return
   }
 
-  if (typeof searchQuery === 'string') {
-    // Construct Microsoft Graph Search API URL, and perform search only under the base directory.
-    // Use the beta endpoint: the v1.0 search(q=) endpoint returns empty results on personal
-    // OneDrive accounts (known gap), while beta drives the same search reliably.
-    const searchRootPath = encodePath('/')
-    const encodedPath = searchRootPath === '' ? searchRootPath : searchRootPath + ':'
+  const searchRootPath = encodePath('/')
+  const encodedPath = searchRootPath === '' ? searchRootPath : `${searchRootPath}:`
+  // Follow the configured cloud endpoint (international / 21Vianet) instead of
+  // hardcoding graph.microsoft.com.
+  const searchApi = `${graphOrigin()}/beta/me/drive/root${encodedPath}/search(q='${sanitiseQuery(searchQuery)}')`
 
-    const searchApi = `https://graph.microsoft.com/beta/me/drive/root${encodedPath}/search(q='${sanitiseQuery(searchQuery)}')`
+  try {
+    const { data } = await axios.get(searchApi, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: {
+        select: 'id,name,file,folder,parentReference',
+        $top: Math.max(1, Math.min(200, Number(siteConfig.maxItems) || 100)),
+      },
+    })
 
-    try {
-      const { data } = await axios.get(searchApi, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        params: {
-          select: 'id,name,file,folder,parentReference',
-          top: siteConfig.maxItems,
-        },
-      })
-      // Search results must never expose files under protected routes:
-      // filter them out server-side before results reach the client.
-      const filtered = (data.value as OdSearchResult).filter(item => !isProtectedGraphPath(item.parentReference?.path ?? ''))
-      res.status(200).json(filtered)
-    } catch (error) {
-      const err = error as { response?: { status?: number; data?: unknown } }
-      res.status(err.response?.status ?? 500).json({ error: err.response?.data ?? 'Internal server error.' })
-    }
-  } else {
-    res.status(200).json([])
+    const items = Array.isArray(data?.value) ? (data.value as OdSearchResult) : []
+    // Search results must never expose items under protected routes. Check the
+    // item itself as well as its parent so the protected folder's own result is
+    // not returned.
+    const filtered = items.filter(item => {
+      const parentPath = item?.parentReference?.path
+      if (typeof parentPath !== 'string' || parentPath.length === 0) return false
+      return !isProtectedGraphItem(parentPath, item.name)
+    })
+
+    setPublicCache(res)
+    res.status(200).json(filtered)
+  } catch (error) {
+    setNoStore(res)
+    const status = (error as { response?: { status?: number } })?.response?.status
+    const safeStatus = typeof status === 'number' && status >= 400 && status < 500 ? status : 500
+    res.status(safeStatus).json({ error: 'Search failed.' })
   }
-  return
 }

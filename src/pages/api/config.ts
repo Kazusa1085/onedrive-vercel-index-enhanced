@@ -11,6 +11,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return
   }
 
+  res.setHeader('Cache-Control', 'no-store')
   res.status(200).json({
     clientId: apiConfig.clientId,
     userPrincipalName: siteConfig.userPrincipalName,

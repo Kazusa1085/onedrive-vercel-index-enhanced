@@ -12,9 +12,9 @@ import { extractAuthCodeFromRedirected } from '../../utils/oAuthClient'
 
 export async function getServerSideProps() {
   // dynamic import keeps server-only deps like ioredis out of the client bundle
-  const { getAccessToken } = await import('../api');
+  const { getAccessToken } = await import('../../utils/onedriveApi')
   // Get accessToken using getAccessToken function
-  const accessToken = await getAccessToken();
+  const accessToken = await getAccessToken()
   // If the accessToken exists, redirect to the home page
   if (accessToken) {
     return {
@@ -66,8 +66,8 @@ export default function OAuthStep2({ oAuthUrl, redirectUri }: { oAuthUrl: string
             <h3 className="mt-4 mb-2 text-lg font-medium">{'Step 2/3: Get authorisation code'}</h3>
 
             <p className="py-1 text-sm font-medium text-red-400">
-                <FontAwesomeIcon icon="exclamation-circle" className="mr-1" /> If you are not the owner of this website,
-                stop now, as continuing with this process may expose your personal files in OneDrive.
+              <FontAwesomeIcon icon="exclamation-circle" className="mr-1" /> If you are not the owner of this website,
+              stop now, as continuing with this process may expose your personal files in OneDrive.
             </p>
 
             <div

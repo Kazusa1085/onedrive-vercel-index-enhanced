@@ -35,7 +35,6 @@ export default function CustomEmbedLinkMenu({
   menuOpen: boolean
   setMenuOpen: Dispatch<SetStateAction<boolean>>
 }) {
-
   const hashedToken = getStoredToken(path)
 
   // Focus on input automatically when menu modal opens
@@ -45,6 +44,27 @@ export default function CustomEmbedLinkMenu({
   const readablePath = getReadablePath(path)
   const filename = readablePath.substring(readablePath.lastIndexOf('/') + 1)
   const [name, setName] = useState(filename)
+  const encodedName = encodeURIComponent(name.trim() || filename)
+
+  // The API decodes the query value once, so the human-readable variant must
+  // start from a decoded path. The already-encoded variant (`path` from
+  // Next's asPath) is inserted verbatim to avoid double-encoding.
+  const decodedPath = path
+    .split('/')
+    .map(segment => {
+      try {
+        return decodeURIComponent(segment)
+      } catch {
+        return segment
+      }
+    })
+    .join('/')
+
+  const customLink = (pathValue: string, alreadyEncoded: boolean) => {
+    const queryPath = alreadyEncoded ? pathValue : encodeURIComponent(pathValue)
+    const token = hashedToken ? `&odpt=${encodeURIComponent(hashedToken)}` : ''
+    return `${getBaseUrl()}/api/name/${encodedName}?path=${queryPath}${token}`
+  }
 
   return (
     <Transition appear show={menuOpen} as={Fragment}>
@@ -102,24 +122,10 @@ export default function CustomEmbedLinkMenu({
                   onChange={e => setName(e.target.value)}
                 />
 
-                <LinkContainer
-                  title={'Default'}
-                  value={buildRawUrl(readablePath)}
-                />
-                <LinkContainer
-                  title={'URL encoded'}
-                  value={buildRawUrl(path)}
-                />
-                <LinkContainer
-                  title={'Customised'}
-                  value={`${getBaseUrl()}/api/name/${name}?path=${readablePath}${
-                    hashedToken ? `&odpt=${hashedToken}` : ''
-                  }`}
-                />
-                <LinkContainer
-                  title={'Customised and encoded'}
-                  value={`${getBaseUrl()}/api/name/${name}?path=${path}${hashedToken ? `&odpt=${hashedToken}` : ''}`}
-                />
+                <LinkContainer title={'Default'} value={buildRawUrl(readablePath)} />
+                <LinkContainer title={'URL encoded'} value={buildRawUrl(path)} />
+                <LinkContainer title={'Customised'} value={customLink(decodedPath, false)} />
+                <LinkContainer title={'Customised and encoded'} value={customLink(path, true)} />
               </div>
             </div>
           </Transition.Child>

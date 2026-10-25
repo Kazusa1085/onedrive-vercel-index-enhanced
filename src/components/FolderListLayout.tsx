@@ -13,14 +13,12 @@ import { buildRawUrl } from '../utils/buildRawUrl'
 
 // Make a span-with-onClick keyboard accessible: Enter/Space trigger the action,
 // matching native button semantics.
-const activateOnKeyDown =
-  (action: () => void) =>
-  (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      action()
-    }
+const activateOnKeyDown = (action: () => void) => (e: React.KeyboardEvent) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    action()
   }
+}
 
 // Column widths (desktop): Name 6 + Last Modified 3 + Size 1 + Actions 2 =
 // 12 tracks. The header and every row share this exact same grid so columns
@@ -172,13 +170,21 @@ const FolderRow = ({
   )
 }
 
+interface FolderListLayoutProps {
+  path: string
+  folderChildren: OdFolderChildren[]
+  folderGenerating: { [key: string]: boolean }
+  handleFolderDownload: (path: string, id: string, name?: string) => () => void
+  toast: typeof import('react-hot-toast').default
+}
+
 const FolderListLayout = ({
   path,
   folderChildren,
   folderGenerating,
   handleFolderDownload,
   toast,
-}) => {
+}: FolderListLayoutProps) => {
   const clipboard = useClipboard()
 
   return (

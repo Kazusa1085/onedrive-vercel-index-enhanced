@@ -13,6 +13,9 @@ import type { OdAPIResponse, OdFolderChildren } from '../types'
  * @param props.progress Current downloading and compression progress (returned by jszip metadata)
  */
 export function DownloadingToast({ router, progress }: { router: NextRouter; progress?: string }) {
+  const numericProgress = progress ? Number.parseFloat(progress) : 0
+  const safeProgress = Number.isFinite(numericProgress) ? Math.max(0, Math.min(100, numericProgress)) : 0
+
   return (
     <div className="flex items-center space-x-2">
       <div className="w-56">
@@ -20,7 +23,10 @@ export function DownloadingToast({ router, progress }: { router: NextRouter; pro
 
         <div className="relative mt-2">
           <div className="flex h-1 overflow-hidden rounded-sm bg-gray-100">
-            <div style={{ width: `${progress}%` }} className="bg-gray-500 text-white transition-all duration-100"></div>
+            <div
+              style={{ width: `${safeProgress}%` }}
+              className="bg-gray-500 text-white transition-all duration-100"
+            ></div>
           </div>
         </div>
       </div>
@@ -46,8 +52,12 @@ export function downloadBlob({ blob, name }: { blob: Blob; name: string }) {
   el.href = bUrl
   el.download = name
   el.click()
-  window.URL.revokeObjectURL(bUrl)
-  el.remove()
+  // Give the browser a moment to start the download before invalidating the
+  // object URL; revoking synchronously can cancel it in older WebViews.
+  window.setTimeout(() => {
+    window.URL.revokeObjectURL(bUrl)
+    el.remove()
+  }, 1_000)
 }
 
 /**
@@ -91,7 +101,7 @@ export async function downloadTreelikeMultipleFiles({
       .reverse()
       .findIndex(
         ({ path: parent }) =>
-          path.substring(0, parent.length) === parent && path.substring(parent.length + 1).indexOf('/') === -1
+          path.substring(0, parent.length) === parent && path.substring(parent.length + 1).indexOf('/') === -1,
       )
     if (i === -1) {
       throw new Error('File array does not satisfy requirement')
@@ -104,7 +114,7 @@ export async function downloadTreelikeMultipleFiles({
     } else {
       dir.file(
         name ?? '',
-        fetch(url!).then(r => r.blob())
+        fetch(url!).then(r => r.blob()),
       )
     }
   }

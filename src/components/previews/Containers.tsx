@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 import FourOhFour from '../FourOhFour'
 import Loading from '../Loading'
 
-export function PreviewContainer({ children }): ReactNode {
+export function PreviewContainer({ children }: { children: ReactNode }): ReactNode {
   return (
     <div className="card-base p-3 text-(--content-main) transition-all duration-300 ease-in-out hover:shadow-(--card-shadow-hover)">
       {children}
@@ -11,7 +11,7 @@ export function PreviewContainer({ children }): ReactNode {
   )
 }
 
-export function DownloadBtnContainer({ children }): ReactNode {
+export function DownloadBtnContainer({ children }: { children: ReactNode }): ReactNode {
   return (
     <div className="sticky bottom-0 left-0 right-0 z-10 rounded-sm border-t border-(--line-divider) bg-(--card-bg-transparent) p-2 shadow-(--card-shadow) backdrop-blur-md">
       {children}

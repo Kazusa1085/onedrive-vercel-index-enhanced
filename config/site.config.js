@@ -37,7 +37,9 @@ module.exports = {
   // googleFontMono - the monospace font used in onedrive-vercel-index.
   googleFontMono: 'JetBrains Mono',
   // googleFontLinks -  an array of links for referencing the google font assets.
-  googleFontLinks: ['https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto:wght@400;500;700&display=swap'],
+  googleFontLinks: [
+    'https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto:wght@400;500;700&display=swap',
+  ],
 
   // [OPTIONAL] Whether to show the search entry (button + Ctrl/Cmd+K shortcut).
   // Disabled because Microsoft Graph search returns no results on this personal
@@ -64,14 +66,10 @@ module.exports = {
 
   // [OPTIONAL] This is where you specify the folders that are password protected. It is an array of paths pointing to all
   // the directories in which you have .password set. Check the documentation for details.
-  protectedRoutes: [
-    '/㊙️ Private',
-    '/🎵 Music',
-    '/🥁 Taiko/🎶 TJA/🎵 Real TJA'
-  ],
+  protectedRoutes: ['/㊙️ Private', '/🎵 Music', '/🥁 Taiko/🎶 TJA/🎵 Real TJA'],
 
   // [OPTIONAL] Use "" here if you want to remove this email address from the nav bar.
-  email: 'mailto:kazusa1085@raanna.icu',
+  email: 'mailto:kazusa1085@raana.icu',
 
   // [OPTIONAL] This is an array of names and links for setting your social information and links.
   // In the latest update, all brand icons inside font awesome is supported and the icon to render is based on the name

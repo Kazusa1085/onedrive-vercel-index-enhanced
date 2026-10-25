@@ -14,14 +14,12 @@ import { buildRawUrl } from '../utils/buildRawUrl'
 
 // Make a span-with-onClick keyboard accessible: Enter/Space trigger the action,
 // matching native button semantics.
-const activateOnKeyDown =
-  (action: () => void) =>
-  (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      action()
-    }
+const activateOnKeyDown = (action: () => void) => (e: React.KeyboardEvent) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    action()
   }
+}
 
 const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
   // We use the generated medium thumbnail for rendering preview images (excluding folders)
@@ -37,13 +35,13 @@ const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
       <div className="h-32 overflow-hidden rounded-xl border border-(--line-divider) transition-all duration-200 group-hover:rounded-2xl">
         {thumbnailUrl && !brokenThumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
-            <img
-              className="h-full w-full object-cover object-top"
-              src={thumbnailUrl}
-              alt={c.name}
-              loading="lazy"
-              decoding="async"
-              onError={() => setBrokenThumbnail(true)}
+          <img
+            className="h-full w-full object-cover object-top"
+            src={thumbnailUrl}
+            alt={c.name}
+            loading="lazy"
+            decoding="async"
+            onError={() => setBrokenThumbnail(true)}
           />
         ) : (
           <div className="relative flex h-full w-full items-center justify-center rounded-lg">
@@ -149,26 +147,34 @@ const FolderGridItem = ({
                 toast.success('Copied raw file permalink.')
               }}
             >
-                    <FontAwesomeIcon icon={['far', 'copy']} />
-                  </span>
-                  <a
-                    title="Download file"
-                    aria-label={`Download file ${c.name}`}
-                    className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
-                    href={buildRawUrl(getItemPath(c.name))}
-                  >
-                    <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
-                  </a>
-                </div>
-              )}
-            </div>
+              <FontAwesomeIcon icon={['far', 'copy']} />
+            </span>
+            <a
+              title="Download file"
+              aria-label={`Download file ${c.name}`}
+              className="btn-plain flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary)"
+              href={buildRawUrl(getItemPath(c.name))}
+            >
+              <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
+            </a>
+          </div>
+        )}
+      </div>
 
-            <Link href={getItemPath(c.name)} passHref>
-              <GridItem c={c} path={getItemPath(c.name)} />
-            </Link>
-            <div className="card-glare" />
-        </div>
+      <Link href={getItemPath(c.name)} passHref>
+        <GridItem c={c} path={getItemPath(c.name)} />
+      </Link>
+      <div className="card-glare" />
+    </div>
   )
+}
+
+interface FolderGridLayoutProps {
+  path: string
+  folderChildren: OdFolderChildren[]
+  folderGenerating: { [key: string]: boolean }
+  handleFolderDownload: (path: string, id: string, name?: string) => () => void
+  toast: typeof import('react-hot-toast').default
 }
 
 const FolderGridLayout = ({
@@ -177,7 +183,7 @@ const FolderGridLayout = ({
   folderGenerating,
   handleFolderDownload,
   toast,
-}) => {
+}: FolderGridLayoutProps) => {
   const clipboard = useClipboard()
 
   return (

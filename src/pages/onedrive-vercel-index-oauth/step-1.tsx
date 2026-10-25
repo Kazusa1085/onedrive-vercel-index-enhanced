@@ -11,8 +11,8 @@ export async function getServerSideProps() {
   const { default: apiConfig } = await import('../../../config/api.config')
   // Get accessToken using getAccessToken function
   // (dynamic import keeps server-only deps like ioredis out of the client bundle)
-  const { getAccessToken } = await import('../api');
-  const accessToken = await getAccessToken();
+  const { getAccessToken } = await import('../../utils/onedriveApi')
+  const accessToken = await getAccessToken()
   // If the accessToken exists, redirect to the home page
   if (accessToken) {
     return {
@@ -30,11 +30,28 @@ export async function getServerSideProps() {
       authApi: apiConfig.authApi,
       driveApi: apiConfig.driveApi,
       scope: apiConfig.scope,
+      usingFallbackCredentials: !process.env.CLIENT_ID || !process.env.SECRET_KEY,
     },
   }
 }
 
-export default function OAuthStep1({ clientId, redirectUri, authApi, driveApi, scope }) {
+interface OAuthStep1Props {
+  clientId: string
+  redirectUri: string
+  authApi: string
+  driveApi: string
+  scope: string
+  usingFallbackCredentials: boolean
+}
+
+export default function OAuthStep1({
+  clientId,
+  redirectUri,
+  authApi,
+  driveApi,
+  scope,
+  usingFallbackCredentials,
+}: OAuthStep1Props) {
   const router = useRouter()
 
   return (
@@ -55,30 +72,46 @@ export default function OAuthStep1({ clientId, redirectUri, authApi, driveApi, s
 
             <h3 className="mt-4 mb-2 text-lg font-medium">{'Step 1/3: Preparations'}</h3>
 
+            {usingFallbackCredentials && (
+              <p className="my-2 rounded-sm border border-yellow-400/40 bg-yellow-400/10 p-2 text-sm font-medium text-yellow-500">
+                <FontAwesomeIcon icon="exclamation-triangle" className="mr-1" />
+                This deployment is using the public OneManager fallback app registration. Configure CLIENT_ID and
+                SECRET_KEY with your own Azure app before sharing it publicly.
+              </p>
+            )}
+
+            {!siteConfig.userPrincipalName && (
+              <p className="my-2 rounded-sm border border-red-400/40 bg-red-400/10 p-2 text-sm font-medium text-red-400">
+                <FontAwesomeIcon icon="exclamation-triangle" className="mr-1" />
+                USER_PRINCIPAL_NAME is not configured. The OAuth callback will refuse to store tokens without a verified
+                owner account.
+              </p>
+            )}
+
             <p className="py-1 text-sm font-medium text-yellow-400">
-                <FontAwesomeIcon icon="exclamation-triangle" className="mr-1" /> If you have not specified a REDIS_URL
-                inside your Vercel env variable, go initialise one at{' '}
-                <a href="https://upstash.com/" target="_blank" rel="noopener noreferrer" className="underline">
-                  Upstash
-                </a>
-                . Docs:{' '}
-                <a
-                  href="https://docs.upstash.com/redis/howto/vercelintegration"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  Vercel Integration - Upstash
-                </a>
-                .
+              <FontAwesomeIcon icon="exclamation-triangle" className="mr-1" /> If you have not specified a REDIS_URL
+              inside your Vercel env variable, go initialise one at{' '}
+              <a href="https://upstash.com/" target="_blank" rel="noopener noreferrer" className="underline">
+                Upstash
+              </a>
+              . Docs:{' '}
+              <a
+                href="https://docs.upstash.com/redis/howto/vercelintegration"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                Vercel Integration - Upstash
+              </a>
+              .
             </p>
 
             <p className="py-1">
-                Authorisation is required as no valid{' '}
-                <code className="font-mono text-sm underline decoration-pink-600 decoration-wavy">access_token</code> or{' '}
-                <code className="font-mono text-sm underline decoration-green-600 decoration-wavy">refresh_token</code>{' '}
-                is present on this deployed instance. Check the following configurations before proceeding with
-                authorising onedrive-vercel-index with your own Microsoft account.
+              Authorisation is required as no valid{' '}
+              <code className="font-mono text-sm underline decoration-pink-600 decoration-wavy">access_token</code> or{' '}
+              <code className="font-mono text-sm underline decoration-green-600 decoration-wavy">refresh_token</code> is
+              present on this deployed instance. Check the following configurations before proceeding with authorising
+              onedrive-vercel-index with your own Microsoft account.
             </p>
 
             <div className="my-4 overflow-hidden">
@@ -129,9 +162,9 @@ export default function OAuthStep1({ clientId, redirectUri, authApi, driveApi, s
             </div>
 
             <p className="py-1 text-sm font-medium">
-                <FontAwesomeIcon icon="exclamation-triangle" className="mr-1 text-yellow-400" /> If you see anything
-                missing or incorrect, you need to reconfigure{' '}
-                <code className="font-mono text-xs">/config/api.config.js</code> and redeploy this instance.
+              <FontAwesomeIcon icon="exclamation-triangle" className="mr-1 text-yellow-400" /> If you see anything
+              missing or incorrect, you need to reconfigure{' '}
+              <code className="font-mono text-xs">/config/api.config.js</code> and redeploy this instance.
             </p>
 
             <div className="mb-2 mt-6 text-right">

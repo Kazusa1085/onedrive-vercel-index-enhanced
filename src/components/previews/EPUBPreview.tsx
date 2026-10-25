@@ -24,7 +24,10 @@ const EPUBPreview: FC<{ file: OdFileObject }> = ({ file: _file }) => {
 
   // Fix for not valid epub files according to
   // https://github.com/gerhardsletten/react-reader/issues/33#issuecomment-673964947
-  const fixEpub = rendition => {
+  // react-reader does not export its rendition type; keep this compatibility
+  // shim deliberately loose.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fixEpub = (rendition: any) => {
     const spineGet = rendition.book.spine.get.bind(rendition.book.spine)
     rendition.book.spine.get = function (target: string) {
       const targetStr = target as string

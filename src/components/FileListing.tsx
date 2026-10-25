@@ -2,7 +2,7 @@ import type { OdAPIResponse, OdFileObject, OdFolderChildren, OdFolderObject } fr
 import { ParsedUrlQuery } from 'querystring'
 import { FC, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import emojiRegex from 'emoji-regex'
 
 import dynamic from 'next/dynamic'
@@ -13,11 +13,7 @@ import { getPreviewType, preview } from '../utils/getPreviewType'
 import { useProtectedSWRInfinite } from '../utils/fetchWithSWR'
 import { getExtension, getRawExtension, getFileIcon } from '../utils/getFileIcon'
 import { buildRawUrl } from '../utils/buildRawUrl'
-import {
-  DownloadingToast,
-  downloadTreelikeMultipleFiles,
-  traverseFolder,
-} from './MultiFileDownloader'
+import { DownloadingToast, downloadTreelikeMultipleFiles, traverseFolder } from './MultiFileDownloader'
 
 import { layouts } from './SwitchLayout'
 import Loading, { LoadingIcon } from './Loading'
@@ -158,6 +154,13 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   }
 
   const responses: OdAPIResponse[] = data ?? []
+  if (responses.length === 0) {
+    return (
+      <PreviewContainer>
+        <FourOhFour title="Empty response" message="The directory returned no data. Try reloading the page." />
+      </PreviewContainer>
+    )
+  }
 
   const isLoadingMore = size > 0 && data && typeof data[size - 1] === 'undefined'
   const isEmpty = responses.length === 0
@@ -219,8 +222,6 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
 
     return (
       <>
-        <Toaster />
-
         {layout.name === 'Grid' ? <FolderGridLayout {...folderProps} /> : <FolderListLayout {...folderProps} />}
 
         {!onlyOnePage && (

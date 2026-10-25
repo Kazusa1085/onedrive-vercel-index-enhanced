@@ -11,7 +11,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "format": "prettier 'src/**/*.{js,ts,jsx,tsx}' --write"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+    "format": "prettier 'src/**/*.{js,ts,jsx,tsx}' --write",
+    "format:check": "prettier 'src/**/*.{js,ts,jsx,tsx}' --check"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
@@ -21,14 +26,15 @@
     "@fortawesome/react-fontawesome": "^3.3.1",
     "@headlessui/react": "^2.2.10",
     "awesome-debounce-promise": "^2.1.0",
-    "axios": "1.19.0",
+    "axios": "1.20.0",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.20",
     "emoji-regex": "^10.6.0",
     "ioredis": "^5.10.1",
     "jszip": "^3.10.1",
-    "katex": "0.16.46",
+    "katex": "0.19.1",
     "mpegts.js": "^1.8.0",
+    "next": "16.4.3",
     "nextjs-progressbar": "^0.0.16",
     "pdfjs-dist": "^6.2.108",
     "plyr-react": "^6.0.0",
@@ -56,32 +62,33 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
-    "@next/eslint-plugin-next": "^16.2.6",
+    "@next/eslint-plugin-next": "^16.4.3",
     "@tailwindcss/postcss": "4.3.0",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "24.12.4",
     "@types/react": "19.2.15",
     "@types/react-dom": "^19.2.3",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "eslint": "10.8.1",
-    "eslint-config-next": "16.3.0",
+    "eslint": "10.10.0",
+    "eslint-config-next": "16.4.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.6.0",
-    "next": "16.3.0",
-    "postcss": "8.5.15",
+    "postcss": "8.5.31",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "4.3.0",
     "typescript": "6.0.3",
-    "typescript-eslint": "^8.67.0"
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^5.0.5"
   },
   "prettier": {
     "printWidth": 120,
     "arrowParens": "avoid",
     "singleQuote": true,
-    "semi": false
+    "semi": false,
+    "endOfLine": "auto"
   }
 }

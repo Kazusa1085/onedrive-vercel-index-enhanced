@@ -13,7 +13,6 @@ import { getExtension } from '../../utils/getFileIcon'
 import type Mpegts from 'mpegts.js'
 import { getStoredToken } from '../../utils/protectedRouteHandler'
 import { buildRawUrl } from '../../utils/buildRawUrl'
-import { getBaseUrl } from '../../utils/getBaseUrl'
 
 import { DownloadButton } from '../DownloadBtnGtoup'
 import { DownloadBtnContainer, PreviewContainer } from './Containers'
@@ -69,7 +68,13 @@ const VideoPlayer: FC<{
   }, [videoUrl, isFlv, mpegts, subtitle])
 
   // Common plyr configs, including the video source and plyr options
-  const plyrSource = {
+  const plyrSource: {
+    type: string
+    title: string
+    poster: string
+    tracks: Array<{ kind: string; label: string; src: string; default: boolean }>
+    sources?: Array<{ src: string }>
+  } = {
     type: 'video',
     title: videoName,
     poster: thumbnail,
@@ -81,7 +86,7 @@ const VideoPlayer: FC<{
   }
   if (!isFlv) {
     // If the video is not in flv format, we can use the native plyr and add sources directly with the video URL
-    plyrSource['sources'] = [{ src: videoUrl }]
+    plyrSource.sources = [{ src: videoUrl }]
   }
   return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
 }
@@ -103,11 +108,21 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
   // We also format the raw video file for the in-browser player as well as all other players
   const videoUrl = buildRawUrl(asPath)
 
+  // nPlayer expects `nplayer-http://host/path`, not a nested absolute URL.
+  const nPlayerUrl = (() => {
+    try {
+      const url = new URL(videoUrl)
+      return `nplayer-${url.protocol.replace(':', '')}://${url.host}${url.pathname}${url.search}`
+    } catch {
+      return videoUrl
+    }
+  })()
+
   const isFlv = getExtension(file.name) === 'flv'
   const {
     loading,
     error,
-    result: mpegts
+    result: mpegts,
   } = useAsync(async () => {
     if (isFlv) {
       return (await import('mpegts.js')).default
@@ -165,22 +180,22 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
           />
 
           <DownloadButton
-            onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
+            onClickCallback={() => window.open(`iina://weblink?url=${encodeURIComponent(videoUrl)}`)}
             btnText="IINA"
             btnImage="/players/iina.png"
           />
           <DownloadButton
-            onClickCallback={() => window.open(`vlc://${getBaseUrl()}${videoUrl}`)}
+            onClickCallback={() => window.open(`vlc://${videoUrl}`)}
             btnText="VLC"
             btnImage="/players/vlc.png"
           />
           <DownloadButton
-            onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
+            onClickCallback={() => window.open(`potplayer://${videoUrl}`)}
             btnText="PotPlayer"
             btnImage="/players/potplayer.png"
           />
           <DownloadButton
-            onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
+            onClickCallback={() => window.open(nPlayerUrl)}
             btnText="nPlayer"
             btnImage="/players/nplayer.png"
           />

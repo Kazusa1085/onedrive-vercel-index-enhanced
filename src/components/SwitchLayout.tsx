@@ -40,8 +40,7 @@ const SwitchLayout = () => {
               <Listbox.Option
                 key={layout.id}
                 className={`${
-                  layout.name === preferredLayout.name &&
-                  'bg-(--primary)/10 text-(--title-active)'
+                  layout.name === preferredLayout.name && 'bg-(--primary)/10 text-(--title-active)'
                 } relative flex cursor-pointer select-none items-center py-1.5 pl-3 text-(--content-main) hover:opacity-80`}
                 value={layout}
               >

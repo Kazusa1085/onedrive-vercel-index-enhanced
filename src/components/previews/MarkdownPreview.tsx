@@ -1,4 +1,4 @@
-import { FC, CSSProperties, ReactNode, useState } from 'react'
+import { FC, CSSProperties, HTMLAttributes, ReactNode, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Components, ExtraProps, Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -160,7 +160,11 @@ const CodeBlock: FC<{ language: string; code: string }> = ({ language, code }) =
           className="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-white/70 transition-opacity duration-150 hover:bg-white/10 hover:text-white focus-visible:opacity-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--primary) md:opacity-0 md:group-hover:opacity-100"
           onClick={copyCode}
         >
-          {copied ? <FontAwesomeIcon className="h-3 w-3 text-emerald-400" icon="check" /> : <FontAwesomeIcon className="h-3 w-3" icon="copy" />}
+          {copied ? (
+            <FontAwesomeIcon className="h-3 w-3 text-emerald-400" icon="check" />
+          ) : (
+            <FontAwesomeIcon className="h-3 w-3" icon="copy" />
+          )}
         </button>
       </div>
       <SyntaxHighlighter
@@ -175,7 +179,12 @@ const CodeBlock: FC<{ language: string; code: string }> = ({ language, code }) =
           fontSize: '0.875rem',
           lineHeight: '1.5rem',
         }}
-        lineNumberStyle={{ color: 'rgba(255, 255, 255, 0.25)', minWidth: '2.5em', paddingRight: '1em', userSelect: 'none' }}
+        lineNumberStyle={{
+          color: 'rgba(255, 255, 255, 0.25)',
+          minWidth: '2.5em',
+          paddingRight: '1em',
+          userSelect: 'none',
+        }}
         codeTagProps={{ className: 'code-block-content' }}
         PreTag="div"
       >
@@ -193,10 +202,15 @@ const MarkdownPreview: FC<{
   // The parent folder of the markdown file, which is also the relative image folder
   const parentPath = standalone ? path.substring(0, path.lastIndexOf('/')) : path
 
-  const { response: content, error, validating } = useFileContent(`/api/raw/?path=${parentPath}/${file.name}`, path)
+  const {
+    response: content,
+    error,
+    validating,
+  } = useFileContent(`/api/raw/?path=${parentPath}/${encodeURIComponent(file.name)}`, path)
 
-  // Check if the image is relative path instead of a absolute url
-  const isUrlAbsolute = (url: string | string[]) => url.indexOf('://') > 0 || url.indexOf('//') === 0
+  // Treat any URI scheme (http:, data:, blob:, …) or protocol-relative URL as
+  // absolute; only bare paths such as `./image.png` need the OneDrive proxy.
+  const isUrlAbsolute = (url: string) => /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(url)
   // Token for protected-route images (the `raw=true` endpoint only accepts the
   // token via the `odpt` query parameter).
   const imageToken = getStoredToken(parentPath)
@@ -215,10 +229,7 @@ const MarkdownPreview: FC<{
         }
       })
       .join('/')
-    const encodedPath = `${decodedParent}/${src}`
-      .split('/')
-      .map(encodeURIComponent)
-      .join('/')
+    const encodedPath = `${decodedParent}/${src}`.split('/').map(encodeURIComponent).join('/')
     return `/api/?path=${encodedPath}&raw=true${imageToken ? `&odpt=${imageToken}` : ''}`
   }
   // Custom renderer:
@@ -273,11 +284,7 @@ const MarkdownPreview: FC<{
       const inline = !match && (!node?.position || node.position.start.line === node.position.end.line)
 
       if (inline) {
-        return (
-          <code className={className}>
-            {children}
-          </code>
-        )
+        return <code className={className}>{children}</code>
       }
 
       const rawLanguage = (match ? match[1] : 'text').toLowerCase()
@@ -286,7 +293,16 @@ const MarkdownPreview: FC<{
     },
     // span: intercept spoilers rendered by the textDirective handler; all
     // other spans (including KaTeX internals) pass through untouched.
-    span({ className, children, node: _node, ...rest }) {
+    span({
+      className,
+      children,
+      node: _node,
+      ...rest
+    }: {
+      className?: string
+      children?: ReactNode
+      node?: unknown
+    } & HTMLAttributes<HTMLSpanElement>) {
       if (className?.includes('spoiler')) {
         return <Spoiler>{children}</Spoiler>
       }
@@ -319,7 +335,9 @@ const MarkdownPreview: FC<{
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkMath, remarkDirective, remarkGithubAdmonitions]}
             remarkRehypeOptions={{ handlers: directiveHandlers } as unknown as Options['remarkRehypeOptions']}
-            rehypePlugins={siteConfig.allowRawHtmlInMarkdown ? [...RAW_HTML_SANITIZE_PLUGINS, rehypeKatex] : [rehypeKatex]}
+            rehypePlugins={
+              siteConfig.allowRawHtmlInMarkdown ? [...RAW_HTML_SANITIZE_PLUGINS, rehypeKatex] : [rehypeKatex]
+            }
             components={customRenderer as Components}
           >
             {content}
